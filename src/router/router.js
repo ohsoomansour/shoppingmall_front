@@ -1,0 +1,36 @@
+import {createWebHashHistory, createWebHistory, createRouter } from "vue-router";
+import PostList from "@/components/post/PostList.vue";
+import App from "@/App.vue";
+
+
+const routes = [
+    /* 
+    {
+        path:"/",
+        name: "home",
+        component: () => import("../App.vue"),
+    },
+    */
+    {
+        path : "/writing",
+        name : "writing",
+        component: () => import("../components/post/WritingPost.vue")
+    },
+    {
+        path: "/posts",
+        name: "posts",
+        component: () => import("@/components/post/PostList.vue")
+    },
+    
+    
+
+]
+
+
+
+const router = createRouter({
+    history: createWebHashHistory(),
+    routes,
+})
+
+export default router;

@@ -1,22 +1,19 @@
 <template>
-    <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to MVNO"/>
-    <post-list post-title="게시판 리스트"> </post-list>
- </div>
+  <div id="app">
+    <!-- 경로와 일치하는 컴포넌트를 여기서 렌더링 합니다 -->
+  </div>
+  <router-view></router-view> 
+
 </template>
 
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import PostList from './components/PostList.vue'
-
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
-    PostList
+    
+    
   }
 }
 </script>
