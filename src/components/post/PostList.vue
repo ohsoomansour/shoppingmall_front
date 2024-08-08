@@ -10,16 +10,16 @@
 <template>
   <v-container fluid style="color: lightgreen;">
     <v-card class="">
-        <v-card-title>게시판</v-card-title>
-        <template v-slot:text>
-          <v-text-field
-            v-model="search"
-            label="Search"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            hide-details
-            single-line
-          ></v-text-field>
+      <template v-slot:text>
+          <v-card-title>MVNO 총판매실 실시간 데이터 집계 API 및 배치 개발</v-card-title>
+            <v-text-field
+              v-model="search"
+              label="Search"
+              prepend-inner-icon="mdi-magnify"
+              variant="outlined"
+              hide-details
+              single-line
+            ></v-text-field>
           <v-data-table
             :headers="headers"
             :items="posts"
@@ -29,7 +29,6 @@
           </v-data-table>
         </template>
     </v-card>
-
   </v-container>        
 
 </template>
@@ -37,20 +36,43 @@
     export default {
         data(){
           return{
+            test : 'testing..',
             search: '',
+            /*part_no, 제품 명, 작성자 등등, ## socket으로 실시간 통신 ->   판매량 집계 ##
+              총 판매 집계 -> SELECT COUNT(SALES) AS sales_count * FROM P_SALES 
+               - 시나리오1 : 구매 <socket 통신> - 클라이언트에서 new_count=2; -> 서버 총 buy_count += new_count 
+                 -> 전체 클라이언트(=room에 있는 session아이디 )에 buy_count를 뿌림    
+                 -> 기능 : 구매 클라이언트(임시) + ***서버 중심*** + ***MVNO 총판매실 실시간 데이터 집계*** 
+            */
             posts:[
                 { p_id: 1, p_title: "첫 번째 게시물", u_name: "사용자1", u_type: "G", p_contents: "게시물 내용1", created_at: "2024-08-01", p_view: 10 },
-                { p_id: 2, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 }
+                { p_id: 2, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 3, p_title: "첫 번째 게시물", u_name: "사용자1", u_type: "G", p_contents: "게시물 내용1", created_at: "2024-08-01", p_view: 10 },
+                { p_id: 4, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 5, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 6, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 7, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 8, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 9, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 10, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 11, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 12, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 13, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 14, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 15, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 16, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+                { p_id: 17, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
+
 
             ],
             headers:[
-              { align:'center', key: 'no',   sortable:false,  title: 'p_id'},
-              { align:'center', key: '제목',  title: 'p_title' },
-              { align:'center', key: '작성자', title: 'u_name' },
-              { align:'center', key: '사용자 구분', title: 'u_type' },
-              { align:'center', key: '내용', title: 'p_contents' },
-              { align:'center', key: '작성시간', title: 'created_at' },
-              { align:'center', key: '조회수', title: 'p_view' },
+              { align:'center', text: 'no',          value: 'p_id',        sortable:true,  },
+              { align:'center', text: '제목',        value: 'p_title' },
+              { align:'center', text: '작성자',      value: 'u_name' },
+              { align:'center', text: '사용자 구분',  value: 'u_type' },
+              { align:'center', text: '내용',        value: 'p_contents' },
+              { align:'center', text: '작성시간',    value: 'created_at' },
+              { align:'center', text: '조회수',      value: 'p_view' },
            ]
           }
         },
@@ -59,10 +81,13 @@
            
         },
         mounted(){
-
+          console.log('MVNO 총판매실 실시간 데이터 집계 랜더링 OK!!');
         },
         methods: {
+          
+          doGetTotalSales(){
             
+          }
         }
     }
 
