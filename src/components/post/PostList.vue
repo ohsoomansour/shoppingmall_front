@@ -4,14 +4,18 @@
      prepend-inner-icon="mdi-magnify - 텍스트 필드의 내부 왼쪽에 돋보기 아이콘을 추가
      variant="outlined" - 텍스트 필드를 외곽선 스타일로 설정 (스타일 옵션)
     
-     
+  <axios 통신 문제>
+  :8088/#/posts:1 Access to XMLHttpRequest at 'http://localhost:8083/api/vuePost/list.do' from origin 
+   'http://localhost:8088' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. 
+
 -->
 
 <template>
   <v-container fluid style="color: lightgreen;">
-    <v-card class="">
-      <template v-slot:text>
-          <v-card-title>MVNO 총판매실 실시간 데이터 집계 API 및 배치 개발</v-card-title>
+    <v-card >
+
+          <v-card-title> 화장품 총판매 실시간 데이터 집계 API 및 배치 개발</v-card-title>
+          <v-card-text>
             <v-text-field
               v-model="search"
               label="Search"
@@ -24,10 +28,16 @@
             :headers="headers"
             :items="posts"
             :search="search"
+            item-class="text-center"
           >
 
           </v-data-table>
-        </template>
+          <v-btn href="/#/writing" target="_blank" style="background-color: greenyellow;">
+            <v-icon left>mdi-open-in-new</v-icon>
+            게시 글 작성
+          </v-btn>
+        </v-card-text>  
+
     </v-card>
   </v-container>        
 
@@ -36,7 +46,6 @@
     export default {
         data(){
           return{
-            test : 'testing..',
             search: '',
             /*part_no, 제품 명, 작성자 등등, ## socket으로 실시간 통신 ->   판매량 집계 ##
               총 판매 집계 -> SELECT COUNT(SALES) AS sales_count * FROM P_SALES 
@@ -45,6 +54,7 @@
                  -> 기능 : 구매 클라이언트(임시) + ***서버 중심*** + ***MVNO 총판매실 실시간 데이터 집계*** 
             */
             posts:[
+              /*  
                 { p_id: 1, p_title: "첫 번째 게시물", u_name: "사용자1", u_type: "G", p_contents: "게시물 내용1", created_at: "2024-08-01", p_view: 10 },
                 { p_id: 2, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
                 { p_id: 3, p_title: "첫 번째 게시물", u_name: "사용자1", u_type: "G", p_contents: "게시물 내용1", created_at: "2024-08-01", p_view: 10 },
@@ -62,17 +72,17 @@
                 { p_id: 15, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
                 { p_id: 16, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
                 { p_id: 17, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-
+              */
 
             ],
             headers:[
-              { align:'center', text: 'no',          value: 'p_id',        sortable:true,  },
-              { align:'center', text: '제목',        value: 'p_title' },
-              { align:'center', text: '작성자',      value: 'u_name' },
-              { align:'center', text: '사용자 구분',  value: 'u_type' },
-              { align:'center', text: '내용',        value: 'p_contents' },
-              { align:'center', text: '작성시간',    value: 'created_at' },
-              { align:'center', text: '조회수',      value: 'p_view' },
+              { align:'center', title: 'no',          key: 'p_id',        sortable:true,  },
+              { align:'center', title: '제목',        key: 'p_title' },
+              { align:'center', title: '작성자',      key: 'u_name' },
+              { align:'center', title: '사용자 구분',  key: 'u_type' },
+              { align:'center', title: '내용',        key: 'p_contents' },
+              { align:'center', title: '작성시간',    key: 'created_at' },
+              { align:'center', title: '조회수',      key: 'p_view' }
            ]
           }
         },
@@ -80,15 +90,22 @@
         props:{
            
         },
-        mounted(){
-          console.log('MVNO 총판매실 실시간 데이터 집계 랜더링 OK!!');
-        },
+
         methods: {
           
           doGetTotalSales(){
-            
+            this.axios
+            .get('/api/vuePost/list')
+            .then(res => {
+              this.posts = res.data.postlist;
+              console.log(res.data.postlist)
+            }) 
+            .catch(err => console.error(err));
           }
-        }
+        },
+        mounted(){
+          this.doGetTotalSales();
+        },
     }
 
 </script>

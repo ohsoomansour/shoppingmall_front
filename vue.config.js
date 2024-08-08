@@ -26,6 +26,7 @@
 */
 
 
+
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -37,9 +38,9 @@ module.exports = defineConfig({
     port: 8088,
     // Proxy 설정
     proxy: {
-      // 경로가 "/api" 로 시작하는 요청을 대상으로 proxy 설정
+      // 경로가 "/api" 로 시작하는 요청을 대상으로 proxy 설정, target default 포트가 8080 ? 
       '/': {
-        target: 'http://localhost',
+        target: 'http://localhost:8080',   //## 주의 사항:포트가 꼬여있을 수 있다. port kill이 되지 않을 경우 -> 컴퓨터 off -> cmd에서 netsta -a -o port확인 필요!  ## 
         changeOrigin: true,
         // 요청 경로에서 '/api' 제거
         pathRewrite: { '^/api': '' },
@@ -48,21 +49,4 @@ module.exports = defineConfig({
     },
   },
 })
-/*
-module.exports = defineConfig({
-  transpileDependencies: true,
-  lintOnSave: false,
-  devServer: {
-   client: { overlay : false },
-   proxy: {
-    '/': {
-      target : 'http://localhost:8080',
-      changeOrigin : true,
-      pathRewrite : {'^/api': ' '},
-      ws: false,
-     },
-    },
-  },
-});
-*/
 
