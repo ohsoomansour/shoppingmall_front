@@ -10,12 +10,10 @@
         <v-card-text>
           <v-form ref="form" @submit.prevent="submitForm">
             <v-text-field
-              v-model="e_mail"
+              v-model="u_email"
               label="사용자 아이디"
               :rules="[v => !!v  || '로그인이 필요합니다.']"
-
             >
-
             </v-text-field>
             <v-text-field
               v-model="p_title"
@@ -29,15 +27,15 @@
               :rules="[v => !!v || '내용을 입력하세요']"
               required
             ></v-textarea>
-
             <v-file-input
-              v-model="file"
+              v-model="files"
               label="파일 업로드"
               prepend-icon="mdi-paperclip"
               :rules="[v => !!v || '파일을 선택하세요']"
+              multiple
               required
             ></v-file-input>
-            <v-btn color="primary" @click="" style="margin-right: 10px;">제출</v-btn>
+            <v-btn color="primary" @click="submitForm" style="margin-right: 10px;">제출</v-btn>
             <v-btn color="secondary" @click="resetForm">초기화</v-btn>
           </v-form>
         </v-card-text>
@@ -57,23 +55,42 @@
         },
         data() {
         return {
+          article_no: 0,
           u_email: '',
           p_title: '',
-          p_content: '',
-          file: null,
+          p_contents: '',
+          files: [],
         };
        },
        methods:{
         submitForm(){
+
         // 지정된 검증 규칙을 검사하고, 모든 필드가 유효한 경우 true 그렇지 않은 경우 false
-          if(this.$refs.form.validate()){
+         console.log(this.$refs.form.validate())
+         if(this.$refs.form.validate()){
+            /*
+              let data = {
+              u_email : this.u_email,
+              p_title : this.p_contents,
+              p_contents : this.p_contents
+            }
+
+            formData.append(
+              "key",
+              new Blob([JSON.stringify(data)], {type : "application/json" })
+             );
+            */
             let formData = new FormData();
-            //작성자, u_email를 sessionStorage에서 ? 또는 
-            formData.append('p_title', this.title);
-            formData.append('p_content', this.content);
-            formData.append('file', this.file);
+            formData.append("u_email",this.u_email);
+            formData.append("p_title", this.p_title);
+            formData.append("p_contents", this.p_contents);
+            Array.from(this.files).forEach((file) => {
+              formData.append('files', file);
+              console.log(file);
+            });
+            
             this.axios
-             .post('/api/vuePost/pubPost.do', formData, {
+             .post('/api/vuePost/pubPost.do/:id', formData, {
                 headers:{
                     'Content-Type' : 'multipart/form-data',
                 },
