@@ -55,7 +55,7 @@
         },
         data() {
         return {
-          article_no: 0,
+          u_id: 3, 
           u_email: '',
           p_title: '',
           p_contents: '',
@@ -68,19 +68,14 @@
         // 지정된 검증 규칙을 검사하고, 모든 필드가 유효한 경우 true 그렇지 않은 경우 false
          console.log(this.$refs.form.validate())
          if(this.$refs.form.validate()){
-            /*
-              let data = {
-              u_email : this.u_email,
-              p_title : this.p_contents,
-              p_contents : this.p_contents
-            }
-
-            formData.append(
-              "key",
-              new Blob([JSON.stringify(data)], {type : "application/json" })
-             );
+            /* 24.8.10 (토)
+              u_id, u_email은 sessionStorage에서 가져옴 
+              But 현재 로그인 기능 x
+              임시 :  
             */
+            //## 회원가입 및 LOGIN 기능 추가 후 this.u_id = sessionStorage.getItem("u_id");
             let formData = new FormData();
+            formData.append("u_id", this.u_id);
             formData.append("u_email",this.u_email);
             formData.append("p_title", this.p_title);
             formData.append("p_contents", this.p_contents);
@@ -90,7 +85,7 @@
             });
             
             this.axios
-             .post('/api/vuePost/pubPost.do/:id', formData, {
+             .post('/api/vuePost/pubPost.do', formData, {
                 headers:{
                     'Content-Type' : 'multipart/form-data',
                 },
