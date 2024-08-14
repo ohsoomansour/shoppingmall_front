@@ -12,100 +12,83 @@
 
 <template>
   <v-container fluid style="color: lightgreen;">
+    <menu-list></menu-list>
     <v-card >
+      <v-card-title> 화장품 총판매 실시간 데이터 집계 API 및 배치 개발</v-card-title>
+      <v-card-text>
+        <v-text-field
+          v-model="search"
+          label="Search"
+          prepend-inner-icon="mdi-magnify"
+          variant="outlined"
+          hide-details
+          single-line
+        ></v-text-field>
+      <v-data-table
+        :headers="headers"
+        :items="posts"
+        :search="search"
+        item-class="text-center"
+      >
 
-          <v-card-title> 화장품 총판매 실시간 데이터 집계 API 및 배치 개발</v-card-title>
-          <v-card-text>
-            <v-text-field
-              v-model="search"
-              label="Search"
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              hide-details
-              single-line
-            ></v-text-field>
-          <v-data-table
-            :headers="headers"
-            :items="posts"
-            :search="search"
-            item-class="text-center"
-          >
-
-          </v-data-table>
-          <v-btn href="/#/writing" target="_blank" style="background-color: greenyellow;">
-            <v-icon left>mdi-open-in-new</v-icon>
-            게시 글 작성
-          </v-btn>
-        </v-card-text>  
+      </v-data-table>
+      <v-btn href="/#/writing" target="_blank" style="background-color: greenyellow;">
+        <v-icon left>mdi-open-in-new</v-icon>
+        게시 글 작성
+      </v-btn>
+    </v-card-text>  
 
     </v-card>
   </v-container>        
 
 </template>
 <script>
+  import MenuList from '@/components/common/MenuList.vue'
     export default {
-        data(){
-          return{
-            search: '',
-            /*part_no, 제품 명, 작성자 등등, ## socket으로 실시간 통신 ->   판매량 집계 ##
-              총 판매 집계 -> SELECT COUNT(SALES) AS sales_count * FROM P_SALES 
-               - 시나리오1 : 구매 <socket 통신> - 클라이언트에서 new_count=2; -> 서버 총 buy_count += new_count 
-                 -> 전체 클라이언트(=room에 있는 session아이디 )에 buy_count를 뿌림    
-                 -> 기능 : 구매 클라이언트(임시) + ***서버 중심*** + ***MVNO 총판매실 실시간 데이터 집계*** 
-            */
-            posts:[
-              /*  
-                { p_id: 1, p_title: "첫 번째 게시물", u_name: "사용자1", u_type: "G", p_contents: "게시물 내용1", created_at: "2024-08-01", p_view: 10 },
-                { p_id: 2, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 3, p_title: "첫 번째 게시물", u_name: "사용자1", u_type: "G", p_contents: "게시물 내용1", created_at: "2024-08-01", p_view: 10 },
-                { p_id: 4, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 5, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 6, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 7, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 8, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 9, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 10, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 11, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 12, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 13, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 14, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 15, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 16, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-                { p_id: 17, p_title: "두 번째 게시물", u_name: "사용자2", u_type: "A", p_contents: "게시물 내용2", created_at: "2024-08-02", p_view: 20 },
-              */
-
-            ],
-            headers:[
-              { align:'center', title: 'no',          key: 'p_id',        sortable:true,  },
-              { align:'center', title: '제목',        key: 'p_title' },
-              { align:'center', title: '작성자',      key: 'u_name' },
-              { align:'center', title: '사용자 구분',  key: 'u_type' },
-              { align:'center', title: '내용',        key: 'p_contents' },
-              { align:'center', title: '작성시간',    key: 'created_at' },
-              { align:'center', title: '조회수',      key: 'p_view' }
-           ]
-          }
-        },
-        name: 'PostList',
-        props:{
-           
-        },
-
-        methods: {
+      components:{
+        MenuList
+      },
+      data(){
+        return{
+          search: '',
+          /*part_no, 제품 명, 작성자 등등, ## socket으로 실시간 통신 ->   판매량 집계 ##
+            총 판매 집계 -> SELECT COUNT(SALES) AS sales_count * FROM P_SALES 
+              - 시나리오1 : 구매 <socket 통신> - 클라이언트에서 new_count=2; -> 서버 총 buy_count += new_count 
+                -> 전체 클라이언트(=room에 있는 session아이디 )에 buy_count를 뿌림    
+                -> 기능 : 구매 클라이언트(임시) + ***서버 중심*** + ***MVNO 총판매실 실시간 데이터 집계*** 
+          */
+          posts:[],
+          headers:[
+            { align:'center', title: 'no',          key: 'p_id',        sortable:true,  },
+            { align:'center', title: '제목',        key: 'p_title' },
+            { align:'center', title: '작성자',      key: 'u_name' },
+            { align:'center', title: '사용자 구분',  key: 'u_type' },
+            { align:'center', title: '내용',        key: 'p_contents' },
+            { align:'center', title: '작성시간',    key: 'created_at' },
+            { align:'center', title: '조회수',      key: 'p_view' }
+          ]
+        }
+      },
+      name: 'PostList',
+      props:{
           
-          doGetTotalSales(){
-            this.axios
-            .get('/api/vuePost/list')
-            .then(res => {
-              this.posts = res.data.postlist;
-              console.log(res.data.postlist)
-            }) 
-            .catch(err => console.error(err));
-          }
-        },
-        mounted(){
-          this.doGetTotalSales();
-        },
+      },
+
+      methods: {
+        
+        doGetTotalSales(){
+          this.axios
+          .get('/api/vuePost/list')
+          .then(res => {
+            this.posts = res.data.postlist;
+            console.log(res.data.postlist)
+          }) 
+          .catch(err => console.error(err));
+        }
+      },
+      mounted(){
+        this.doGetTotalSales();
+      },
     }
 
 </script>

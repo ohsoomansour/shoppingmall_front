@@ -62,22 +62,46 @@
                     </v-btn>
                   </v-col>
                   <v-col cols="6">
-                    <v-btn 
-                      text 
-                      @click="forgotPassword"
-                      color="grey lighten-3"
-                    >
+                    
+                    <v-btn color="grey lighten-3" @click="dialog = true">
                       비밀번호 찾기
                     </v-btn>
                   </v-col>
-
+                  
                 </v-row>
               </v-container>
             </v-form>
           </v-card>
         </v-col>
       </v-row>
-    </v-container>
+      <!-- 팝업창(다이얼로그) -->
+      <v-dialog v-model="dialog" max-width="500px">
+        <v-card>
+          <v-card-title class="headline">
+            비밀번호 발급을 위해 이메일 계정을 입력하세요.
+          </v-card-title>
+
+          <v-card-text>
+           <v-text-field v-model="emailToFindPw">
+
+           </v-text-field>
+           <v-btn
+            style="background-color: greenyellow; font-weight: bold"
+            @click="findPw"
+           > 비밀번호 발급 
+           </v-btn>
+          </v-card-text>
+
+          <v-card-actions>
+            <!-- 팝업 닫기 버튼 -->
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="dialog = false">
+              닫기
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      </v-container>
   </v-content> 
 </v-app>
 </template>
@@ -86,12 +110,32 @@
 export default {
   data() {
     return {
+      dialog: false, // 팝업창 열림 여부를 제어하는 데이터
+      emailToFindPw:"",
       u_email: '',
       u_pw: '',
       gourl: '/'
     };
   },
   methods: {
+    popUpToFindPW(){
+      
+    },
+    findPw(){
+      //popup 창 -> user의 u-email -> pw찾기 api 
+      let formData =  new FormData();
+      formData.append("email", this.emailToFindPw);
+  
+      this.axios
+      .post("/api//send-mail/password", formData, {
+        headers:{
+          'Content-Type' : 'application/json'
+        }
+      })
+      .then(res => alert(JSON.stringify(res.data)))
+      
+
+    },
     alertPopupFocus(message, ref) {
       console.log("===========>" + ref); //u_email , u_pw
       alert(message);
@@ -129,7 +173,7 @@ export default {
         console.log(response.data);
 
         // Save the result in session storage
-        sessionStorage.setItem('loginMenu', (response.data.loginMenu));
+        sessionStorage.setItem('loginMenu', JSON.stringify(response.data.loginmenu));
         sessionStorage.setItem('u_id', response.data.u_id);
         sessionStorage.setItem('u_email', response.data.u_email);
 

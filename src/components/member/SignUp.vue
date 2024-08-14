@@ -50,7 +50,6 @@
               :rules="[validatePassword]"
               required
             ></v-text-field>
-
             <!-- 비밀번호 확인 -->
             <v-text-field
               v-model="passwordConfirm"
@@ -59,7 +58,6 @@
               :rules="[validatePasswordConfirm]"
               required
             ></v-text-field>
-
             <!-- 이름 -->
             <v-text-field
               v-model="u_name"
@@ -67,7 +65,6 @@
               required
               :rules="[v => !!v || '이름은 필수입니다.']"
             ></v-text-field>
-
             <!-- 이메일 -->
             <v-row>
               <v-col>
@@ -77,19 +74,17 @@
                   :rules="[v => !!v || '이메일은 필수입니다.']"
                 ></v-text-field>
               </v-col>
-              <v-col md="1" >
+              <v-col sm="2" >
                 <v-text-field 
                   v-model="golbaeng"
                   readonly  
-                  class="center-text" 
-            
-
+                  class="center-text"  
                 ></v-text-field>
               </v-col>
               <v-col>
                 <v-text-field
                   v-if="this.selectedDomain === '직접 입력'"
-                  v-model="emailDomain"
+                  v-model="w_emailDomain"
                   label="도메인 직접입력"
                   :rules="[v => !!v || '도메인은 필수입니다.']"
                   
@@ -102,9 +97,24 @@
                   :items="emailDomains"
                 ></v-select>
               </v-col>
-              
+              <v-col>
+                {{ this.selectedDomain}}
+                <v-btn @click="getAuthNum" style="background-color: greenyellow; font-weight: bold">이메일 인증 </v-btn>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  v-model="authNum"
+                  @keyup="onAuth"
+                >
+                </v-text-field>
+              </v-col>  
             </v-row>
-
+            <v-alert v-if="idCheckResult" :type="idCheckResult.type">
+              {{ idCheckResult.message }}
+            </v-alert>
+            <v-alert v-if="emailAuthResult" :type="emailAuthResult.type">
+                {{ emailAuthResult.message }}
+            </v-alert>
             <!-- 휴대전화 번호 -->
             <v-text-field
               v-model="u_ph"
@@ -157,6 +167,9 @@
 export default {
   data() {
     return {
+      authNum: "",
+      rec_authNum : "",
+      emailAuthResult : null,
       valid: false,
       golbaeng:"@",
       u_type: "A",
@@ -165,7 +178,7 @@ export default {
       passwordConfirm: "",
       u_name: "",
       biz_email1: "",
-      emailDomain: "",
+      w_emailDomain: "",
       selectedDomain: "선택 입력",
       emailDomains: ["직접 입력", "naver.com", "gmail.com", "daum.net", "hanmail.net", "empas.com", "yahoo.com"],
       u_ph: "",
@@ -177,6 +190,43 @@ export default {
   },
   name : 'signup',
   methods:{
+    onAuth(){
+      console.log("authNum ===> " + this.authNum);
+      console.log("rec_authNum ===>" + this.rec_authNum);
+
+      if(this.authNum === this.rec_authNum){
+        this.emailAuthResult = { type:"success", message: "인증 성공!" };
+        
+      } else {
+        this.emailAuthResult = { type:"error", message: "이메일 인증에 실패하였습니다!" };
+      }
+    },
+    getAuthNum(){
+      console.log("===== 선택된 도메인======>" + this.selectedDomain)
+      console.log(" 전송된 이메일 =========>" + this.biz_email1+"@"+this.selectedDomain);
+      let formData = new FormData();
+      let domain="";
+      if(this.selectedDomain === "선택 입력"){
+        alert("도메인을 선택하세요! ");
+        return;
+      } else {
+        domain = this.selectedDomain;
+      }
+      if (this.selectedDomain === "직접 입력"){
+        domain = this.w_emailDomain;
+      } 
+      formData.append("email", this.biz_email1 + "@" + domain);
+      
+      this.axios
+      .post("/api/send-mail/email", formData, {
+        headers:{
+         'Content-Type' : 'application/json'
+        }
+      }) //c
+      .then(res => {
+        this.rec_authNum = res.data.authNum;
+      })
+    },
     directDomain(){
       console.log("================= directDomain======")
     },
@@ -187,22 +237,13 @@ export default {
       );
     },
     validatePasswordConfirm(v) {
-      console.log("validatePasswordConfirm's v 확인 =========================>" + v)  //dhtnaksen@3
-      return v === this.u_pw || "비밀번호가 일치하지 않습니다.";
+      console.log("validatePasswordConfirm's v 확인 =========================>" + v) 
     },
     validatePhoneNumber(v) {
       return /^\d+$/.test(v) || "숫자만 입력 가능합니다.";
     },
     SelectDomain(e) {
       console.log("event", e)
-      /*
-      if (this.selectedDomain !== "직접입력") {
-
-        this.emailDomain = this.selectedDomain;
-      } else {
-        this.emailDomain = "";
-      }*/
-        
     },
     execDaumPostcode() {
       // Daum 주소 API 연동
@@ -217,18 +258,12 @@ export default {
       }).open();
     },
     checkDuplicateId() {
-      // 아이디 중복 체크 로직
-      // Ajax 요청을 통해 서버에서 중복 체크 후 결과 반환
+      // 아이디 중복 체크 
       if (!this.u_email) {
         this.idCheckResult = { type: "error", message: "아이디를 입력해주세요." };
         return;
       }
-      /* 성공 시
-      params:{
-            gubun : "ID",
-            u_email : this.userId,
-          }
-      */
+
       this.axios
         .get('/api/member/userDuplicCheck.do', {
           params:{
@@ -253,11 +288,11 @@ export default {
       if (!this.$refs.form.validate()) {
         return;
       }
-      console.log("form 데이터 확인 =========>" + this.u_type, this.u_email, this.u_pw, this.u_name, this.address, this.detailAddress, this.biz_email1, this.selectedDomain, this.emailDomain)
+      console.log("form 데이터 확인 =========>" + this.u_type, this.u_email, this.u_pw, this.u_name, this.address, this.detailAddress, this.biz_email1, this.selectedDomain, this.w_emailDomain)
       //이메일 
       let biz_email2="";
       if(this.selectedDomain === "직접 입력"){
-        biz_email2 = this.emailDomain;
+        biz_email2 = this.w_emailDomain;
       } else {
         biz_email2 = this.selectedDomain; 
       }
