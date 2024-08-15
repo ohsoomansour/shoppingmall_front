@@ -150,23 +150,16 @@ export default {
         this.alertPopupFocus('비밀번호를 입력해 주세요.', 'u_pw');
         return false;
       }
-      /*
-       this.axios
-      .post('/login/Vueloginx.do', formData, {
-        headers : {
-          'Content-Type' : 'Multipart/form-data'
-        }
-      */
+      console.log("===========>" + this.u_email);
+      console.log("================> " + this.u_pw);
 
-    
       let formData = new FormData();
       formData.append("u_email", this.u_email);
       formData.append("u_pw", this.u_pw);
       this.axios
-      this.axios
-      .post('/login/Vueloginx.do', formData, {
+      .post('/api/login/Vueloginx.do', formData, {
         headers : {
-          'Content-Type' : 'application/json'     //'Multipart/form-data'
+          'Content-Type' : 'application/json', //'application/json'   //'multipart/form-data'
         }})
       .then(response => {
         console.log('===================== 로그인 성공 ===============');

@@ -11,10 +11,14 @@
 -->
 
 <template>
+
   <v-container fluid style="color: lightgreen;">
-    <menu-list></menu-list>
-    <v-card >
+    <!--<<menu-list></menu-list> -->
+    <VTreeViewSample ></VTreeViewSample> 
+    
+    <v-card class="mt-4">
       <v-card-title> 화장품 총판매 실시간 데이터 집계 API 및 배치 개발</v-card-title>
+      
       <v-card-text>
         <v-text-field
           v-model="search"
@@ -44,9 +48,12 @@
 </template>
 <script>
   import MenuList from '@/components/common/MenuList.vue'
+  //import VTreeViewSample from '@/components/common/VTreeViewSample.vue'
+  import VTreeViewSample from "../common/VTreeViewSample.vue"
     export default {
       components:{
-        MenuList
+        //MenuList,
+        VTreeViewSample
       },
       data(){
         return{

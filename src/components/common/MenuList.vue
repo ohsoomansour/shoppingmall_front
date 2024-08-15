@@ -33,16 +33,25 @@
       :active.sync="active"
       item-key="id"
       item-text="name"
+      :children-key="'children'"
       item-children="children"
       :load-children="fetchChildren"
       :selection-type="selectionType"
       selectable
     >
+      <template v-slot:prepend="{ item, open }">
+        <v-icon v-if="open">mdi-chevron-down</v-icon>
+        <v-icon v-else>mdi-chevron-right</v-icon>
+      </template>
+      <template v-slot:label="{ item }">
+        <a :href="item.menu_url">{{ item.name }}</a>
+      </template>
     </v-treeview>
   </v-container>
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -50,32 +59,55 @@ export default {
       open: [], // 열린 노드를 추적
       active: [], // 활성화된 노드를 추적
       items: [
-        /*
         {
-          id: 1,
-          name: "Root 1",
-          children: [
+          "id": "A0",
+          "name": "회원관리",
+          "parent_menu_id": "A0",
+          "menu_url": "/admin/memberList.do",
+          "depth": "0",
+          "auth_seqno": "1",
+          "children": [
             {
-              id: 2,
-              name: "Child 1",
-              children: [
-                { id: 3, name: "Grandchild 1" },
-                { id: 4, name: "Grandchild 2" },
-              ],
+              "id": "A1",
+              "name": "회원 정보 수정",
+              "menu_url": "/admin/AeditMember.do",
+              "depth": "1",
+              "auth_seqno": "2"
             },
-            { id: 5, name: "Child 2" },
-          ],
+            {
+              "id": "A2",
+              "name": "포인트 얻기",
+              "menu_url": "/admin/getPoint.do",
+              "depth": "1",
+              "auth_seqno": "3"
+            }
+          ]
         },
         {
-          id: 6,
-          name: "Root 2",
-          children: [
-            { id: 7, name: "Child 3" },
-            { id: 8, name: "Child 4" },
-          ],
-        },
-        */
-      ],
+          "id": "G0",
+          "name": "게시판 조회",
+          "parent_menu_id": "G0",
+          "menu_url": "/post/list.do",
+          "depth": "0",
+          "auth_seqno": "4",
+          "children": [
+            {
+              "id": "G1",
+              "name": "게시판 글 작성",
+              "menu_url": "/post/write.do",
+              "depth": "1",
+              "auth_seqno": "5"
+            },
+            {
+              "id": "G2",
+              "name": "게시판 글 수정",
+              "menu_url": "/post/update.do",
+              "depth": "1",
+              "auth_seqno": "6"
+            }
+          ]
+        }
+      ]
     };
   },
   methods: {

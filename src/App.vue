@@ -1,9 +1,10 @@
 <template>
   <div id="app">
+    <v-app> 
     <!-- 경로와 일치하는 컴포넌트를 여기서 렌더링 합니다 -->
-  </div>
-  <router-view></router-view> 
-
+    <router-view></router-view> 
+  </v-app>
+  </div>  
 </template>
 
 

@@ -220,7 +220,7 @@ export default {
       this.axios
       .post("/api/send-mail/email", formData, {
         headers:{
-         'Content-Type' : 'application/json'
+         'Content-Type' : 'application/json' //'application/json' //'multipart/form-data'
         }
       }) //c
       .then(res => {

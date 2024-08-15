@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@vitejs/plugin-vue": "^5.1.2",
     "axios": "^1.7.3",
     "core-js": "^3.38.0",
     "vue": "^3.4.37",
@@ -26,7 +27,7 @@
     "eslint-plugin-vue": "^8.0.3",
     "vite-plugin-vuetify": "^2.0.3",
     "vue-cli-plugin-vuetify": "~2.5.8",
-    "vuetify": "^3.6.14"
+    "vuetify": "^3.5.9"
   },
   "eslintConfig": {
     "root": true,
