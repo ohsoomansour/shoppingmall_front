@@ -1,0 +1,68 @@
+<!-- ### 방법1. 리덕스로 state값을 관리 
+- 리덕스를 써야 하는 이유 : 여러 state값을 관리하기 좋다. 
+- 로직 :  Order 컴포넌트, 웹 소켓 구현 => redux, 구매 수 (state값) 관리 => socket server에 
+
+  
+-->
+
+<template>
+   <h1>WebSocket Example</h1>
+    <input v-model="messageToSend" placeholder="Type a message"/>
+    <button @click="sendMessage">Send Message</button>
+    <div v-if="receivedMessage">
+      <h2>Received Message:</h2>
+      <p>{{ receivedMessage }}</p>
+   </div>
+
+</template>
+
+<script>
+export default{
+  name: 'order',
+
+  data(){
+    return {
+      ws: null,
+      messageToSend : '',
+      receivedMessage :''
+    }
+  },
+  mounted(){
+    this.initWebSocket();
+  },
+
+  methods:{
+    initWebSocket(){
+      this.ws = new WebSocket('ws://localhost:8080/ws/sales')
+      
+      this.ws.onpoen = () => {
+        console.log("================== WebSocket connection opened");
+      }
+      this.ws.onmessage = (event) => {
+        this.receivedMessage = event.data;
+        console.log("receivedMessage================> ", this.receivedMessage)
+      }
+      this.ws.onclose = () => {
+        console.log("WebSocket connection closed!!");
+      }
+      this.ws.onerror = (e) => {
+        console.error(e);
+      }
+
+    },
+    sendMessage() {
+      if (this.messageToSend && this.ws) {
+        this.ws.send(this.messageToSend); // 서버로 메시지 전송
+        this.messageToSend = ''; // 전송 후 입력 필드 초기화
+      }
+    },
+    beforeDestroy() {
+    // 컴포넌트가 파괴되기 전에 웹소켓 연결 종료
+    if (this.ws) {
+      this.ws.close();
+    }
+  } 
+  }
+  }
+
+</script>

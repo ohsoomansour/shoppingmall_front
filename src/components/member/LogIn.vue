@@ -164,11 +164,16 @@ export default {
       .then(response => {
         console.log('===================== 로그인 성공 ===============');
         console.log(response.data);
-
-        // Save the result in session storage
-        sessionStorage.setItem('loginMenu', JSON.stringify(response.data.loginmenu));
-        sessionStorage.setItem('u_id', response.data.u_id);
-        sessionStorage.setItem('u_email', response.data.u_email);
+        console.log(response)
+        if(response.statusText === "OK"){
+          // Save the result in session storage
+          sessionStorage.setItem('loginMenu', JSON.stringify(response.data.loginmenu));
+          sessionStorage.setItem('u_id', response.data.u_id);
+          sessionStorage.setItem('u_email', response.data.u_email);
+          window.location.href="/#/posts"
+        } else {
+          alert("아이디 혹은 비밀번호가 잘못 되었습니다")
+        }
 
       }).catch(error => {
         console.log(error);

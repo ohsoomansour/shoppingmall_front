@@ -21,120 +21,94 @@
    
   Q. id와 name외 'key'와 'value'을 가져올 것인가
   A. 
+  
+   <template v-slot:prepend="{ item }" >
+   </template>
+   - v-slot : 부모 컴포넌트가 자식 컴포넌트의 슬롯에 콘텐츠를 삽입 
+   - v-slot:prepend는 특정 컴포넌트의 prepend 영역에 콘텐츠를 삽입하기 위해 사용되는 슬롯 디렉티브
+    prepend 슬롯은 '특정 컴포넌트'에서 자주 제공되는 슬롯 중 하나로, 주로 '콘텐츠나 요소의 앞부분에 추가적인 내용을 삽입'하고 싶을 때 사용됩니다. 
+    예를 들어, 텍스트 필드 앞에 아이콘을 추가하거나, 리스트 항목 앞에 체크박스를 넣는 경우
+
+   #v-card 와꾸 
+    <v-card class="mx-auto" max-width="400">
+        <v-card-title>Card Title</v-card-title>
+        <v-card-text>This is some text within a card.</v-card-text>
+        <v-card-actions>
+          <v-btn color="primary">Action</v-btn>
+        </v-card-actions>
+    </v-card>
+
+  # v-model:opened="open": v-treeview 컴포넌트에서 어떤 항목들이 열려 있는지를 open이라는 배열과 동기화  
+  # :custom-filter="filterFn" 
+   const filterFn = (value, search, item) => {
+    
+    return caseSensitive.value ? value.indexOf(search) > -1 : value.toLowerCase().indexOf(search.toLowerCase()) > -1
+   }
+  **** 반환 값이 true, true를 반환한 항목만 표시 OR false를 반환! " ****
   -->
 
 <template>
-  <v-container>
-    <v-treeview
-      :items="items"
-      open-on-click
-      activatable
-      :open.sync="open"
-      :active.sync="active"
-      item-key="id"
-      item-text="name"
-      :children-key="'children'"
-      item-children="children"
-      :load-children="fetchChildren"
-      :selection-type="selectionType"
-      selectable
-    >
-      <template v-slot:prepend="{ item, open }">
-        <v-icon v-if="open">mdi-chevron-down</v-icon>
-        <v-icon v-else>mdi-chevron-right</v-icon>
-      </template>
-      <template v-slot:label="{ item }">
-        <a :href="item.menu_url">{{ item.name }}</a>
-      </template>
-    </v-treeview>
-  </v-container>
+  <v-card>
+    <v-sheet class="pa-4 primary lighten-2">
+      <v-text-field
+        v-model="search"
+        clear-icon="mdi-close-circle-outline"
+        label="Search Shoppingmall Category"
+        clearable
+        dark
+        flat
+        hide-details
+        solo-inverted
+      ></v-text-field>
+      <v-checkbox
+        v-model="caseSensitive"
+        label="대/소문자 구분 검색"
+        dark
+        hide-details
+      ></v-checkbox>
+    </v-sheet class="pa-4 primary lighten-2">
+      <v-card-text>
+      <v-treeview
+        v-model:opened="open"
+        :custom-filter="filterFn"
+        :items="items"
+        :search="search"
+        item-value="id"
+      >
+        <template v-slot:prepend="{ item }">
+          <router-link :to="item.menu_url">
+            <v-btn 
+              v-if="item.menu_url"
+              icon
+            >
+              <!-- 아이콘을 넣거나 버튼 내용 추가 가능 -->
+              <v-icon>mdi-link</v-icon>
+            </v-btn>
+          </router-link>
+        </template>
+
+      </v-treeview>
+    </v-card-text>
+  </v-card>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 
-export default {
-  data() {
-    return {
-      selectionType: 'leaf',
-      open: [], // 열린 노드를 추적
-      active: [], // 활성화된 노드를 추적
-      items: [
-        {
-          "id": "A0",
-          "name": "회원관리",
-          "parent_menu_id": "A0",
-          "menu_url": "/admin/memberList.do",
-          "depth": "0",
-          "auth_seqno": "1",
-          "children": [
-            {
-              "id": "A1",
-              "name": "회원 정보 수정",
-              "menu_url": "/admin/AeditMember.do",
-              "depth": "1",
-              "auth_seqno": "2"
-            },
-            {
-              "id": "A2",
-              "name": "포인트 얻기",
-              "menu_url": "/admin/getPoint.do",
-              "depth": "1",
-              "auth_seqno": "3"
-            }
-          ]
-        },
-        {
-          "id": "G0",
-          "name": "게시판 조회",
-          "parent_menu_id": "G0",
-          "menu_url": "/post/list.do",
-          "depth": "0",
-          "auth_seqno": "4",
-          "children": [
-            {
-              "id": "G1",
-              "name": "게시판 글 작성",
-              "menu_url": "/post/write.do",
-              "depth": "1",
-              "auth_seqno": "5"
-            },
-            {
-              "id": "G2",
-              "name": "게시판 글 수정",
-              "menu_url": "/post/update.do",
-              "depth": "1",
-              "auth_seqno": "6"
-            }
-          ]
-        }
-      ]
-    };
-  },
-  methods: {
-      
-    
-    fetchChildren(item) {
-      return new Promise(resolve => {
-        // 서버에서 데이터를 가져오거나 추가적인 처리를 통해 '자식 노드'를 생성
-        if (item.name === "Child 2") {
-          setTimeout(() => {
-            item.children = [
-              { id: 9, name: "Grandchild 3" },
-              { id: 10, name: "Grandchild 4" },
-            ];
-            resolve(item.children);
-          }, 1000); // 예시로 1초 후에 자식 노드 추가
-        } else {
-          resolve([]);
-        }
-      });
-    },
-  },
-  mounted(){
-    let loginMenu =  sessionStorage.getItem("loginMenu");
-    console.log("loginMenu==========>")
-    console.log(JSON.parse(loginMenu))
-    this.items = JSON.parse(loginMenu);
+const open = ref(['A0', 'A1', 'G0', 'G1', 'G2']); // id 필드 값 기준
+const search = ref(null);
+const caseSensitive = ref(false);
+let items = ref([]);
+let loginMenu =  sessionStorage.getItem("loginMenu"); // 
+console.log("======================== MenuList -loginMenu ========================");
+console.log(JSON.parse(loginMenu)) // parse 안 해줌면 에러터지고 아래 쭉 ~  에러 
+if(loginMenu) {
+  //loginMeneu 값은 문자열로 가져오고 있음 ==> JSON 문자열을 파싱하여 배열로 변환 후 ref로 설정
+    items.value = JSON.parse(loginMenu);
   }
-};
+
+const filterFn = function (value, search, item) {
+    return caseSensitive.value ? value.indexOf(search) > -1 : value.toLowerCase().indexOf(search.toLowerCase()) > -1
+  }
+
 </script>
