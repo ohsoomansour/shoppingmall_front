@@ -1,8 +1,10 @@
 <!-- ### 방법1. 리덕스로 state값을 관리 
-- 리덕스를 써야 하는 이유 : 여러 state값을 관리하기 좋다. 
+- 리덕스를 써야 하는 이유 : 여러 state값을 관리(가시성)하기 좋다. -> vue와 redux보다 vuex가 적절 
+- 설치 : npm i vuex   
 - 로직 :  Order 컴포넌트, 웹 소켓 구현 => redux, 구매 수 (state값) 관리 => socket server에 
+ ✅주문, vuex -> 결제, socket -> 받은 값을 -> vuex, 받은 값-
 
-  
+
 -->
 
 <template>
