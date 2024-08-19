@@ -9,8 +9,8 @@ import "@mdi/font/css/materialdesignicons.css";
 import * as components from "vuetify/components";
 import { VTreeview } from 'vuetify/labs/VTreeview';
 import * as directives from "vuetify/directives";
-
 import VTreeViewSample from "./components/common/VTreeViewSample.vue"
+import store from '@/store/store';
 
 const app = createApp(App);
 const vuetify = createVuetify({
@@ -19,11 +19,12 @@ const vuetify = createVuetify({
     VTreeview,
   },
   directives,
-  })
+})
 app.component('VTreeViewSample', VTreeViewSample);
 
 app.use(router)
    .use(vuetify)
+   .use(store)    //🌟애플리케이션에 plugin하여 vuex 스토어를 global로 등록
    .mount('#app')
 
 

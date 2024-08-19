@@ -1,8 +1,13 @@
+<!-- @Input  
+   input 이벤트가 발생할 때 실행할 메서드를 연결하는 역할
+   :value = "product.quantity" 는 product.quantity의 값이 input의 값으로 바인딩하는 것이다. 즉, defaultValue 같은 거 
+-->
+
 <template>
   <v-container>
     <v-row>
       <v-col
-        v-for="product in products"
+        v-for="product in this.$store.state.products"
         :key="product.id"
         cols="12"
         sm="6"
@@ -10,15 +15,15 @@
       >
         <v-card>
           <v-img :src="product.image" height="200px"></v-img>
-          <v-card-title>{{ product.name }}</v-card-title>
-          <v-card-text>${{ product.price }}</v-card-text>
+          <v-card-text class="text-subtitle-1">화장품 id: {{ product.id }}</v-card-text>
+          <v-card-title class="text-h6">화장품 이름: {{ product.name }}</v-card-title>
+          <v-card-text class="text-subtitle-1">화장품 가격: ${{ product.price }}</v-card-text>
           <v-card-actions>
             <v-text-field
-              v-model="product.quantity"
               label="Quantity"
               type="number"
               min="1"
-              @change="updateQuantity(product)"
+              @change="updatePQnt($event, product.id)"
             ></v-text-field>
             <v-btn color="primary" @click="addToCart(product)">Add to Cart</v-btn>
           </v-card-actions>
@@ -40,11 +45,12 @@ import { mapState, mapActions } from 'vuex';
 export default {
   data(){
     return{
-        
+      temp_quantity : 0
     }
   },
   computed: {
-    ...mapState(['products'])
+    ...mapState(['products']), 
+    ...mapState(['cart'])
   },
   methods: {
     /** 
@@ -53,21 +59,32 @@ export default {
      * @param2 : 액션에 전달할 payload => actions의 addToCart를 호출한다. 
      * @dedscription : 이건 새로 담는 상품의 id, name, quantity까지
      * */
-    addTodo(product){
-      
-      this.$store.dispatch('addToCart', product);
-    },
-    /** 
-     * @Func : 기존 담겨져 있는 상품의 양을 store에 업데이트한다.   
-     * @param1 : 액션의 이름
-     * @param2 : 액션에 전달할 payload . 
-     * @dedscription : 이건 새로 담는 상품의 id, name, quantity까지
-     * */
-    //이 함수는 이미 담겨져있는 상품에 양을 업데이트 
-    updateQuantity(product){
-      this.$store.dispatch('updateProductQuantity', {id: product.id, quantity: product.quantity })
-    }
+     addToCart(product){
+      /*#방법1. cart 에 바로 넣는 방법 
+      const cart = this.$store.state.cart;
+      const itemInCart = cart.find(item => item.id === product.id);
+      console.log("itemInCart ======>" ,itemInCart)
+      if(!itemInCart){
+        product.quantity = parseInt(this.temp_quantity);
+        this.$store.state.cart.push(product);
+        console.log("첫 cart에 담은 items ======> ", this.$store.state.cart);
+      } else {
+        console.log("========== 카트에 존재한다면 수량 추가 후 그 아이템: ===========")
+        const quantityToAdd = parseInt(this.temp_quantity, 10) || 0; 
+        itemInCart.quantity += quantityToAdd;
+        console.log(itemInCart.quantity)
+        console.log(this.$store.state.cart);
+      } */
 
+      const temp_qnt = this.temp_quantity;
+
+      this.$store.dispatch('addToCart', {product, temp_qnt});
+      this.temp_quantity = 0;
+    },
+    updatePQnt(event, productId) {
+      console.log("변경되고 있는 값 ========> ", event.target.value);
+      this.temp_quantity = event.target.value;
+    }
     /********************************* 방법2 ************************************************** 
      *  ...mapActions(['addToCart', 'updateProductQuantity'])
      *  addToCart(product) {
@@ -77,6 +94,9 @@ export default {
      *   this.updateProductQuantity({ id: product.id, quantity: product.quantity });
      * }
      * **************************************************************************************/
+  },
+  mounted(){
+    //this.$store.dispatch('setProducts');
   }
 }
 </script>
