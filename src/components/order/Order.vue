@@ -8,17 +8,18 @@
 -->
 
 <template>
-   <h1>WebSocket Example</h1>
     <input v-model="messageToSend" placeholder="Type a message"/>
-    <button @click="sendMessage">Send Message</button>
+    <v-btn @click="orderFunc" style="background-color: greenyellow;">주문 하기</v-btn>
     <div v-if="receivedMessage">
       <h2>Received Message:</h2>
       <p>{{ receivedMessage }}</p>
-   </div>
+    </div>
 
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default{
   name: 'order',
 
@@ -29,6 +30,9 @@ export default{
       receivedMessage :''
     }
   },
+  computed:{
+    ...mapState(['cart'])
+  },
   mounted(){
     this.initWebSocket();
   },
@@ -37,8 +41,8 @@ export default{
     initWebSocket(){
       this.ws = new WebSocket('ws://localhost:8080/ws/sales')
       
-      this.ws.onpoen = () => {
-        console.log("================== WebSocket connection opened");
+      this.ws.onopen = () => {
+        console.log("====== WebSocket connection opened");
       }
       this.ws.onmessage = (event) => {
         this.receivedMessage = event.data;
@@ -52,13 +56,29 @@ export default{
       }
 
     },
-    sendMessage() {
-      if (this.messageToSend && this.ws) {
-        this.ws.send(this.messageToSend); // 서버로 메시지 전송
-        this.messageToSend = ''; // 전송 후 입력 필드 초기화
+    /* #카카오페이 API & Naver 페이
+                       
+    */
+    payFunc(){
+      
+      // PG,  res.ok message
+      return true;
+    },
+    orderFunc() {
+      //결제 요청 API 함수 호출 
+      const payResult = this.payFunc(); //this => 현재 컴포넌트 인스턴스(Vue 컴포넌트 인스턴스)
+      if(payResult){
+        //무어을 전달 ? id, name, price, quantity
+        const itemInCart = this.$store.state.cart;
+        
+        console.log("=======> itemInCart", JSON.stringify(itemInCart));
+        if (this.ws) {
+          //this.ws.send(JSON.stringify(itemInCart)); // 서버로 메시지 전송
+          this.messageToSend = ''; // 전송 후 입력 필드 초기화
+        }
       }
     },
-    beforeDestroy() {
+    beforeUnmount() {
     // 컴포넌트가 파괴되기 전에 웹소켓 연결 종료
     if (this.ws) {
       this.ws.close();

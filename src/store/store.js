@@ -11,8 +11,8 @@ import Vuex from 'vuex';
 export default new Vuex.Store({
   state:{
     products:[
-      { id: 0, name: 'sample cosmetic', price: 11000, quantity: 0},
-      { id: 1, name: '쌔럼 ', price : 13000, quantity: 0}
+      { id: 0, title: 'sm cosmetic', price: 11000, quantity: 0, options: [ {id: 0 + "_1", title: '+50ml', value: 3000 }, {id: 0 + "_2", title: '+70ml', value: 5000 }]},
+      { id: 1, name: '쌔럼 ', price : 13000, quantity: 0, options: [ {id: 1 + "_0", title: '+40ml', value: 2000 }, {id: 1 + "_1", title: '+80ml', value: 7000 }]}
     ],
     cart: []
     
@@ -23,12 +23,14 @@ export default new Vuex.Store({
       let itemInCart = state.cart.find(item => item.id === product.id); //여기로 인해서 
 
       if(!itemInCart){
-        product.quantity += parseInt(temp_qnt, 10) || 0;;
+        product.quantity += parseInt(temp_qnt, 10);
+        product.total = parseInt(temp_qnt, 10) * product.price; //8.20 
         state.cart.push(product);
         console.log("첫 카트에 넣고 난 후 ========>", state.cart);
       } else {
         //product.quantity = product_qnt;
-        itemInCart.quantity += parseInt(temp_qnt, 10) || 0;; //여기는 정상 계산ss
+        itemInCart.quantity += parseInt(temp_qnt, 10); //여기는 정상 계산ss
+        itemInCart.total = itemInCart.quantity * parseInt(itemInCart.price, 10);
         console.log("아이템이 존재하는 경우 개수를 넣은 후 결과 =====>", state.cart);
       }
     },
