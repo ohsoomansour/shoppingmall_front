@@ -38,7 +38,7 @@
         <v-card>
           <v-img :src="product.image" height="200px"></v-img>
           <v-card-text class="text-subtitle-1">화장품 id: {{ product.id }}</v-card-text>
-          <v-card-title class="text-h6">화장품 이름: {{ product.name }}</v-card-title>
+          <v-card-title class="text-h6">화장품 이름: {{ product.title }}</v-card-title>
           <v-card-text class="text-subtitle-1">화장품 가격: ${{ product.price }}</v-card-text>
           <v-card-actions>
             <v-text-field
@@ -47,21 +47,27 @@
               min="1"
               v-model="quantities[product.id]"
               @input="updatePQnt($event, product.id)"
-            ></v-text-field>
-            
-            
+            ></v-text-field>  
             <v-btn color="primary" @click="addToCart(product)">Add to Cart</v-btn>
           </v-card-actions>
             <v-select
               label="Select an option"  
               :items="product.options"
               item-title="title"
-              item-value="value"
-              v-model="selectedOptions[product.id]"
+              item-value="id"
+              v-model="selectedOption[product.id]"
               hint="Pick your favorite option"
               persistent-hint
             >
             </v-select>
+
+            <v-row
+              
+              v-for="(op, index) in this.product_tempOptions[product.id]"
+            >
+              <v-card-title class="text-h6">{{ op.title }}</v-card-title>
+            </v-row>
+
           <Order />
         </v-card>
       </v-col>
@@ -89,9 +95,10 @@ export default {
       temp_quantity : 0,
       quantities: {},
       options:[],
-
-      selectedOptions: {}, // 각 제품의 선택된 옵션을 저장하는 객체
+      selectedOption: {}, // 각 제품의 선택된 옵션을 저장하는 객체
+      selectedOptions: [],
       quantities: {},
+      product_tempOptions: {}
     }
   },
   computed: {
@@ -106,11 +113,7 @@ export default {
      * @dedscription : 이건 새로 담는 상품의 id, name, quantity까지
      * @단방향binding : ##########:value 또는 @input  ###################
      *  :vaule는 데이터 -> UI 는 데이터를 가져와서 해당 요쇼의 value 속성에 설정 
-     * 
-     * */
-     addToCart(product, index){
-      console.log("=====> ", this.selectedOptions);
-      /*#방법1. cart 에 바로 넣는 방법 
+     *  #방법1. cart 에 바로 넣는 방법 
       const cart = this.$store.state.cart;
       const itemInCart = cart.find(item => item.id === product.id);
       console.log("itemInCart ======>" ,itemInCart)
@@ -124,13 +127,19 @@ export default {
         itemInCart.quantity += quantityToAdd;
         console.log(itemInCart.quantity)
         console.log(this.$store.state.cart);
-      } */
-      
+      } 
+     * */
+     addToCart(product, index){
+      console.log("==== 선택된 옵션 =====> ", this.selectedOption); //  {0은 제품 아이디 : '0_1' 옵션의 아이디 }
+      console.log("==== 선택한 옵션 id =====>:", this.selectedOption[0]) //  0_1 (제품 옵션의 아이디)
+      console.log("====== 선택한 전체 옵션  ============> ", product_tempOptions[product.id])
+      const selectedOps = product_tempOptions[product.id];
       const temp_qnt = this.temp_quantity;
-      this.$store.dispatch('addToCart', {product, temp_qnt}).then(() => {
-        alert(`${product.name}를 ${this.temp_quantity}개를 담았습니다!`)
+      this.$store.dispatch('addToCart', {product, temp_qnt, selectedOps}).then(() => {
+        alert(`${product.title}를 ${this.temp_quantity}개를 담았습니다!`)
         this.temp_quantity = 0;
-        this.quantities[product.id] = 0; 
+        this.quantities[product.id] = 0;
+        
       }).catch((e) => {
         console.error('Error adding to cart:', error);
       })
@@ -140,11 +149,50 @@ export default {
       console.log("변경되고 있는 값 ========> ", event.target.value);
       this.temp_quantity = event.target.value;
     },
+    getSelectedOption(productId){
+     console.log("getSelectedOption' product의 아이디 ===========> ", productId);
+     const selectedProduct =  this.products.find(p => p.id === productId);
+     const selectedOpId = this.selectedOption[productId];
+     const selectedOp = selectedProduct.options.find(op => op.id ===  selectedOpId);  //     {id: 0 + "_1", title: '+50ml', value: 3000 }
+
+     //선택 된 옵션 들 -> '배열 형태'로 담아야 함D
+     if (!this.selectedOptions.includes(selectedOp)) {
+      /*이렇게 하면 당연히 전체 리스트라서 틀렸고 -> (동적으로 product_tempOptions 변수의 값에 넣어줘야 한다. )  -> cart에 넣긱 전  
+      this.selectedOptions.push(selectedOp);
+      */
+    } 
+     //return this.selectedOptions;
+    }
 
   },
-  
+  watch: {
+    selectedOption: {
+      handler(newValue, oldValue) {
+        if(newValue){
+          console.log("selectedOption 값이 변경되었습니다:", newValue); // {0: '0_1', 1: '1_0'}
+        //this.product_tempOptions[0] = newValue[0]
+         //this.product_tempOptions[1] = newValue[1]
+
+          console.log(Object.keys(newValue));
+          const selectedProdIds = Object.keys(newValue)  //['0', '1']
+
+          console.log("watch productId ============> ", selectedProdIds)
+          
+          selectedProdIds.forEach(prodId => {
+            //###아이템에 맞는 임시 옵션 값 동적 바인딩인데 값은 '배열' ###
+            const intProdId = parseInt(prodId);
+            this.product_tempOptions[intProdId] =  Array.isArray(this.product_tempOptions[intProdId]) ? this.product_tempOptions[intProdId] : [];
+            
+            this.product_tempOptions[intProdId] =  this.product_tempOptions[intProdId].push( newValue[intProdId] )
+            this.getSelectedOption(parseInt(prodId))
+          })
+        }
+      },
+      deep: true, // 객체 내부의 변화를 감지하기 위해서 deep 옵션을 사용
+    },
+  },
   mounted(){
-    //this.$store.dispatch('setProducts');
+
   }
 }
 </script>

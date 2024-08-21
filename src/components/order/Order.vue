@@ -8,7 +8,6 @@
 -->
 
 <template>
-    <input v-model="messageToSend" placeholder="Type a message"/>
     <v-btn @click="orderFunc" style="background-color: greenyellow;">주문 하기</v-btn>
     <div v-if="receivedMessage">
       <h2>Received Message:</h2>
