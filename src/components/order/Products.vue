@@ -55,17 +55,39 @@
               :items="product.options"
               item-title="title"
               item-value="id"
-              v-model="selectedOption[product.id]"
+              v-model="this.selectedOption[product.id]"
               hint="Pick your favorite option"
               persistent-hint
             >
             </v-select>
-
             <v-row
-              
-              v-for="(op, index) in this.product_tempOptions[product.id]"
-            >
-              <v-card-title class="text-h6">{{ op.title }}</v-card-title>
+              v-for="(op, index) in this.selectedOptions"
+            > 
+            <v-col v-if="op.id.charAt(0) === (product.id + '')" class="d-flex flex-row align-center justify-center">
+              <v-card-text class="text-h6">{{ op.title }}</v-card-text>
+              <v-card-text class="text-h6">{{ op.quantity }}</v-card-text>
+            </v-col>
+              <v-col v-if="op.id.charAt(0) === (product.id + '') " class="d-flex align-center justify-end mr-2"  >
+                <v-btn @click="decreaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">-</v-btn>
+                <v-btn @click="increaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">+</v-btn>
+                <v-btn @click="delOp(op)" style="background-color: #FF0003;">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="feather feather-x"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+               </v-btn>
+              </v-col>
             </v-row>
 
           <Order />
@@ -88,17 +110,18 @@ import Order from '@/components/order/Order.vue';
  **/
 export default {
   components:{
-    Order
+    //Order
   },
   data(){
     return{ 
       temp_quantity : 0,
       quantities: {},
-      options:[],
-      selectedOption: {}, // 각 제품의 선택된 옵션을 저장하는 객체
+      //options:[],
+      selectedOption: {}, // 각 제품의 선택된 옵션을 저장하는 객체 selectedOption: {},
       selectedOptions: [],
       quantities: {},
-      product_tempOptions: {}
+      product_tempOptions: {},
+      count: 0
     }
   },
   computed: {
@@ -129,68 +152,81 @@ export default {
         console.log(this.$store.state.cart);
       } 
      * */
+     delOp(op){
+      this.selectedOptions =  this.selectedOptions.filter(option => option.id !== op.id)
+     },
+    increaseOpNum(op){
+      //바로 this.count 값을 올리고 그 갑을 optiton을 찾아서 -> 일시적 전체 옵션에 더해주는 로직 
+      if(!op.quantity){
+        op.quantity = 1;
+      } else {
+        op.quantity += 1;
+      }
+      console.log("this.options =============> ", this.selectedOptions)
+    },
+    decreaseOpNum(op){
+      if(op.quantity < 1){
+        alert('선택 옵션의 개수가 0개 입니다!');
+        return;
+      } else {
+        op.quantity -= 1;
+      }
+      console.log("this.options =============> ", this.selectedOptions)
+    },
+    
      addToCart(product, index){
-      console.log("==== 선택된 옵션 =====> ", this.selectedOption); //  {0은 제품 아이디 : '0_1' 옵션의 아이디 }
-      console.log("==== 선택한 옵션 id =====>:", this.selectedOption[0]) //  0_1 (제품 옵션의 아이디)
-      console.log("====== 선택한 전체 옵션  ============> ", product_tempOptions[product.id])
-      const selectedOps = product_tempOptions[product.id];
-      const temp_qnt = this.temp_quantity;
-      this.$store.dispatch('addToCart', {product, temp_qnt, selectedOps}).then(() => {
-        alert(`${product.title}를 ${this.temp_quantity}개를 담았습니다!`)
-        this.temp_quantity = 0;
-        this.quantities[product.id] = 0;
-        
-      }).catch((e) => {
-        console.error('Error adding to cart:', error);
-      })
+      /**/  
+        const productForCart = this.products 
+        productForCart.options = this.selectedOptions;
+        this.$store.dispatch('addToCart', productForCart)
+        console.log("this.$store.state =====>", this.$store.state.cart)
+      
     },
     updatePQnt(event, productId) {
 
       console.log("변경되고 있는 값 ========> ", event.target.value);
       this.temp_quantity = event.target.value;
     },
-    getSelectedOption(productId){
-     console.log("getSelectedOption' product의 아이디 ===========> ", productId);
-     const selectedProduct =  this.products.find(p => p.id === productId);
-     const selectedOpId = this.selectedOption[productId];
-     const selectedOp = selectedProduct.options.find(op => op.id ===  selectedOpId);  //     {id: 0 + "_1", title: '+50ml', value: 3000 }
 
-     //선택 된 옵션 들 -> '배열 형태'로 담아야 함D
-     if (!this.selectedOptions.includes(selectedOp)) {
-      /*이렇게 하면 당연히 전체 리스트라서 틀렸고 -> (동적으로 product_tempOptions 변수의 값에 넣어줘야 한다. )  -> cart에 넣긱 전  
-      this.selectedOptions.push(selectedOp);
-      */
-    } 
-     //return this.selectedOptions;
-    }
 
   },
   watch: {
-    selectedOption: {
-      handler(newValue, oldValue) {
-        if(newValue){
-          console.log("selectedOption 값이 변경되었습니다:", newValue); // {0: '0_1', 1: '1_0'}
-        //this.product_tempOptions[0] = newValue[0]
-         //this.product_tempOptions[1] = newValue[1]
+  selectedOption: {
+    handler(newValue, oldValue) {
+      if (newValue ) {
 
-          console.log(Object.keys(newValue));
-          const selectedProdIds = Object.keys(newValue)  //['0', '1']
+        console.log("selectedOption 값이 변경되었습니다:", Object.keys(newValue)); // ['0', '1']
 
-          console.log("watch productId ============> ", selectedProdIds)
+        Object.keys(newValue).forEach(prodId => {
+          const intProdId = parseInt(prodId);
+          console.log("intProdId =========?", intProdId)
+          // selectedOption[intProdId]가 배열인지 확인하고, 배열이 아니면 빈 배열로 초기화
+     
+          // newValue에서 선택된 옵션을 가져와서 객체로 변환 후 배열에 추가
+          const selectedOpId =  newValue[prodId]; //[{id: '0_2', title: '+70ml', value: 5000}]
+          const selectedProduct = this.products.find(p => p.id === intProdId);
+          //1. 옵션 선택 -> 제품과 맞는 filtering, 뿌려지고 개수 카운팅 -> 카트
+          const selectedOp = selectedProduct.options.find(op => op.id === selectedOpId);  
+          const isOpExist = this.selectedOptions.some(op => 
+            op.id === selectedOp.id && op.title === selectedOp.title && op.value === selectedOp.value
+          )
+
+          if(!isOpExist){
+            this.selectedOptions.push(selectedOp)  // [ {id: '0_0', title: '+50ml', value: 3000 }, {id: '0_1', title: '+70ml', value: 5000 }, {id: 1 + "_0", title: '+40ml', value: 2000 } ... ]
+          }
           
-          selectedProdIds.forEach(prodId => {
-            //###아이템에 맞는 임시 옵션 값 동적 바인딩인데 값은 '배열' ###
-            const intProdId = parseInt(prodId);
-            this.product_tempOptions[intProdId] =  Array.isArray(this.product_tempOptions[intProdId]) ? this.product_tempOptions[intProdId] : [];
-            
-            this.product_tempOptions[intProdId] =  this.product_tempOptions[intProdId].push( newValue[intProdId] )
-            this.getSelectedOption(parseInt(prodId))
-          })
-        }
-      },
-      deep: true, // 객체 내부의 변화를 감지하기 위해서 deep 옵션을 사용
+
+        });
+
+       
+      } else {
+        console.log("newValue가 undefined거나 null입니다.");
+      } 
+      
     },
-  },
+      deep: true, // 객체 내부의 변화를 감지하기 위해서 deep 옵션을 사용
+  }
+},
   mounted(){
 
   }

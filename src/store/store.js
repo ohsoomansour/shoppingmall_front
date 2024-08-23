@@ -11,7 +11,7 @@ import Vuex from 'vuex';
 export default new Vuex.Store({
   state:{
     products:[
-      { id: 0, title: 'sm cosmetic', price: 11000, quantity: 0, options: [ {id: 0 + "_1", title: '+50ml', value: 3000 }, {id: 0 + "_2", title: '+70ml', value: 5000 }]},
+      { id: 0, title: 'sm cosmetic', price: 11000, quantity: 0, options: [ {id: 0 + "_0", title: '+50ml', value: 3000 }, {id: 0 + "_1", title: '+70ml', value: 5000 }]},
       { id: 1, title: '쌔럼 ', price : 13000, quantity: 0, options: [ {id: 1 + "_0", title: '+40ml', value: 2000 }, {id: 1 + "_1", title: '+80ml', value: 7000 }]}
     ],
     cart: []
@@ -19,8 +19,22 @@ export default new Vuex.Store({
   },
   mutations: {
     //#주의 : cart에 product값이 들어간 , 후 처음부터 product.quantity 의 값을 바꾸게 되면 초기 값이 바껴서 중복 계산하게 될 가능성이 있음 
-    ADD_TO_CART(state, {product, temp_qnt, selectedOps}){
-      let itemInCart = state.cart.find(item => item.id === product.id); //여기로 인해서 
+    ADD_TO_CART(state, products){
+
+      /* 방법1.       
+        state.cart.forEach(prodInCart => {
+          console.log("ADD_TO_CART ======> ", prodInCart)
+          products.forEach((product, index) => {
+            if(prodInCart.id !== product.id){
+              state.cart.push(option)
+            } else if(prodInCart.id === product.id) {
+              ///
+              product.options.
+            }
+          })
+        })
+       */ 
+        
 
       if(!itemInCart){
         product.quantity += parseInt(temp_qnt, 10); // 초기 값 + 수량이 더해지는 거거던 
