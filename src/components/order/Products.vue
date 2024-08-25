@@ -30,7 +30,7 @@
     <v-row>
       <v-col
         v-for="(product, index) in this.$store.state.products"
-        :key="product.id"
+        :key="index"
         cols="12"
         sm="6"
         md="4"
@@ -52,49 +52,56 @@
           </v-card-actions>
             <v-select
               label="Select an option"  
+              :key="product.id"
               :items="product.options"
               item-title="title"
               item-value="id"
-              v-model="this.selectedOption[product.id]"
+              v-model="this.selectedOption"
               hint="Pick your favorite option"
               persistent-hint
             >
             </v-select>
+          <v-row 
+            v-for="(prod, index) in this.productsBeingSelected" 
+            :key="index"
+            >       
             <v-row
-              v-for="(op, index) in this.selectedOptions"
+              v-for="(op, index) in prod.options"
+              :key="index"
             > 
-            <v-col v-if="op.id.charAt(0) === (product.id + '')" class="d-flex flex-row align-center justify-center">
+            <v-col v-if="op.id.split('_')[0] === (product.id + '')" class="d-flex flex-row align-center justify-center">
               <v-card-text class="text-h6">{{ op.title }}</v-card-text>
               <v-card-text class="text-h6">{{ op.quantity }}</v-card-text>
             </v-col>
-              <v-col v-if="op.id.charAt(0) === (product.id + '') " class="d-flex align-center justify-end mr-2"  >
-                <v-btn @click="decreaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">-</v-btn>
-                <v-btn @click="increaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">+</v-btn>
-                <v-btn @click="delOp(op)" style="background-color: #FF0003;">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="feather feather-x"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-               </v-btn>
-              </v-col>
+            <v-col v-if="op.id.split('_')[0] === (product.id + '')"  class="d-flex align-center justify-end mr-2"  >
+              <v-btn @click="decreaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">-</v-btn>
+              <v-btn @click="increaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">+</v-btn>
+              <v-btn @click="delOp(op)" style="background-color: #FF0003;">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-x"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              </v-btn>
+            </v-col>
             </v-row>
-
-          <Order />
+          </v-row>
+          
         </v-card>
       </v-col>
 
     </v-row>
+    
   </v-container>
 </template>
 
@@ -115,17 +122,16 @@ export default {
   data(){
     return{ 
       temp_quantity : 0,
-      quantities: {},
-      //options:[],
+      newSelectedProduct: {},
+      quantities:{},
       selectedOption: {}, // 각 제품의 선택된 옵션을 저장하는 객체 selectedOption: {},
-      selectedOptions: [],
-      quantities: {},
-      product_tempOptions: {},
+      newSelectedOp:{},
       count: 0
     }
   },
   computed: {
-    ...mapState(['products']), 
+    ...mapState(['products']),
+    ...mapState(['productsBeingSelected']), 
     ...mapState(['cart'])
   },
   methods: {
@@ -152,8 +158,14 @@ export default {
         console.log(this.$store.state.cart);
       } 
      * */
+     checkCondition(op, product) {
+      console.log('op.id SplitVal:', op.id.split('_')[0], 'product.id:', product.id, 'condition:', op.id.split('_')[0] === String(product.id));
+      return op.id.split('_')[0] === String(product.id);
+    },
      delOp(op){
-      this.selectedOptions =  this.selectedOptions.filter(option => option.id !== op.id)
+      const prodIdToDel = op.id.split('_')[0];
+      let prodInPbs = this.productsBeingSelected.find(prod => prod.id === parseInt(prodIdToDel));
+      prodInPbs.options = prodInPbs.options.filter(opt => opt.id !== op.id);
      },
     increaseOpNum(op){
       //바로 this.count 값을 올리고 그 갑을 optiton을 찾아서 -> 일시적 전체 옵션에 더해주는 로직 
@@ -162,7 +174,6 @@ export default {
       } else {
         op.quantity += 1;
       }
-      console.log("this.options =============> ", this.selectedOptions)
     },
     decreaseOpNum(op){
       if(op.quantity < 1){
@@ -171,16 +182,11 @@ export default {
       } else {
         op.quantity -= 1;
       }
-      console.log("this.options =============> ", this.selectedOptions)
     },
     
      addToCart(product, index){
-      /**/  
-        const productForCart = this.products 
-        productForCart.options = this.selectedOptions;
-        this.$store.dispatch('addToCart', productForCart)
-        console.log("this.$store.state =====>", this.$store.state.cart)
-      
+
+
     },
     updatePQnt(event, productId) {
 
@@ -193,32 +199,67 @@ export default {
   watch: {
   selectedOption: {
     handler(newValue, oldValue) {
+      // 제품 아이디(string): newValue.split('_')[0] -  옵션 아이디 
       if (newValue ) {
+        console.log("새로운 값 변경 ====>", newValue)  //
+        console.log("newValue.split('_')[0] ====> ", newValue.split('_')[0])
+        const productId = newValue.split('_')[0];
+        const selectedIntProdId = parseInt(productId);
+        const resIndex = this.productsBeingSelected.findIndex(prod => prod.id === selectedIntProdId);
+        
+        console.log("resIndex ======>", resIndex)
+        if(resIndex === -1){
+          //없으면 새로 만들어서 넣어주고 
+          const selectedProduct = this.products.find(p => p.id === selectedIntProdId);
+          this.newSelectedProduct.id = selectedIntProdId;
+          this.newSelectedProduct.title = selectedProduct.title;
+          this.newSelectedProduct.price = selectedProduct.price;
+          this.newSelectedProduct.quantity += this.quantities[selectedIntProdId];
+          //{ id: 0, title: 'sm cosmetic', price: 11000, quantity: 0,  } // options: [ {id: 0 + "_0", title: '+50ml', value: 3000
+          this.productsBeingSelected.push(this.newSelectedProduct); 
+          this.newSelectedProduct = {};
+        }
+        const selectedOpId =  this.selectedOption; 
+        this.$store.state.productsBeingSelected.forEach((prod) => {     //집어 넣은 프로덕트  === 선택한 프로적트
+          //변동 감지 제품의 아이디 0, 1 === 선택되어있는 제품들 0, 1 -> 0 두 번! 
+          if(prod.id === selectedIntProdId){
+            if(!Array.isArray(prod.options)){
+              prod.options = [];
+              const prodInList = this.products.find(prodInlist => prodInlist.id === selectedIntProdId);
+              const opInList = prodInList.options.find(opInList => opInList.id === selectedOpId);          
 
-        console.log("selectedOption 값이 변경되었습니다:", Object.keys(newValue)); // ['0', '1']
-
-        Object.keys(newValue).forEach(prodId => {
-          const intProdId = parseInt(prodId);
-          console.log("intProdId =========?", intProdId)
-          // selectedOption[intProdId]가 배열인지 확인하고, 배열이 아니면 빈 배열로 초기화
-     
-          // newValue에서 선택된 옵션을 가져와서 객체로 변환 후 배열에 추가
-          const selectedOpId =  newValue[prodId]; //[{id: '0_2', title: '+70ml', value: 5000}]
-          const selectedProduct = this.products.find(p => p.id === intProdId);
-          //1. 옵션 선택 -> 제품과 맞는 filtering, 뿌려지고 개수 카운팅 -> 카트
-          const selectedOp = selectedProduct.options.find(op => op.id === selectedOpId);  
-          const isOpExist = this.selectedOptions.some(op => 
-            op.id === selectedOp.id && op.title === selectedOp.title && op.value === selectedOp.value
-          )
-
-          if(!isOpExist){
-            this.selectedOptions.push(selectedOp)  // [ {id: '0_0', title: '+50ml', value: 3000 }, {id: '0_1', title: '+70ml', value: 5000 }, {id: 1 + "_0", title: '+40ml', value: 2000 } ... ]
+              this.newSelectedOp.id = opInList.id;
+              this.newSelectedOp.title = opInList.title;
+              this.newSelectedOp.value = opInList.value;
+              prod.options.push(this.newSelectedOp);
+              this.newSelectedOp = {};
+              console.log("product In this.productsBeingSelected ===============>", prod);
+            } else if(prod.options.length >= 0) {
+              // 문제: 아이디 1제품 선택의 경우, ['0'] -> ['0', '1'] 두 번째 0이 여기에서 다시 들어감 그래서 옵션이 한 번 더 들어감 !! 
+              // 해결: prod.options에 제품 1이 있어 ? 그러면 return;
+              console.log("prod.id value, type ==>",prod.id, typeof prod.id)
+              const prodInList = this.products.find(prodInlist => prodInlist.id === selectedIntProdId);
+              const opInList = prodInList.options.find(opInList => opInList.id === selectedOpId);          
+              
+              
+              //const isExistProd = prod.id ===  prodInList.id && prod.title === prodInList.title  
+              const isExistOp = prod.options.some(opSelected => {
+                return opSelected.id === opInList.id && opSelected.title === opInList.title
+              })
+              console.log("(방어 코드.2)isExistOp ======>", isExistOp)  // 
+              if(isExistOp) return;
+              this.newSelectedOp.id = opInList.id;
+              this.newSelectedOp.title = opInList.title;
+              this.newSelectedOp.value = opInList.value;
+              prod.options.push(this.newSelectedOp);
+              this.newSelectedOp = {};
+              console.log("this.productsBeingSelected ===============>", this.productsBeingSelected);
+            }
           }
-          
+          //포맷을 만들어주기 위한 리스트에서 옵션을 가져옴  
 
-        });
-
-       
+        })
+ 
       } else {
         console.log("newValue가 undefined거나 null입니다.");
       } 
