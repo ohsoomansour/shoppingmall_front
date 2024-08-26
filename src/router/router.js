@@ -4,17 +4,16 @@ import App from "@/App.vue";
 
 
 const routes = [
-    /* 
+
     {
-        path:"/",
-        name: "home",
-        component: () => import("../App.vue"),
+        path:"/detailedprod/:id",
+        name: "detailedprod",
+        component: () => import("../components/order/DetailedProduct.vue")
     },
-    */
     {
-        path : "/product",
-        name : "product",
-        component : () => import("@/components/order/Products.vue")   
+        path: "/products",
+        name : "products",
+        component : () => import("@/components/order/Products.vue")  
     },
     {
         path : "/user/login",

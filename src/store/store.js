@@ -11,15 +11,19 @@ export default new Vuex.Store({
   state:{
     products:[
 
-      { id: 0, title: 'sm cosmetic', price: 11000, quantity: 0, options: [ {id: 0 + "_0", title: '+50ml', value: 3000 }, {id: 0 + "_1", title: '+70ml', value: 5000 }]},
-      { id: 1, title: '쌔럼', price : 13000, quantity: 0, options: [ {id: 1 + "_0", title: '+40ml', value: 2000 }, {id: 1 + "_1", title: '+80ml', value: 7000 }]}
+      { id: 0, title: 'sm cosmetic', price: 11000, quantity: 0, options: [ { text : '+50ml', value : 0 + "_0", price : 3000 }, {text: '+70ml', value : 0 + "_1",  price: 5000 }]},
+      { id: 1, title: '쌔럼', price : 13000, quantity: 0, options: [ {text : '+40ml', value : 1 + "_0", price : 2000 }, {text : '+80ml', value : 1 + "_1",  price : 7000 }]},
+      { id: 2, title: '썬크림', price : 12000, quantity: 0, options: [ {text : '+10ml', value : 2 + "_0", price : 2000 }, {text : '+20ml', value : 2 + "_1", price : 7000 }]}
     ],
-    productsBeingSelected:[],
+    selectedProduct: {},
     cart:[]
     
   },
   mutations: {
-    //#주의 : cart에 product값이 들어간 , 후 처음부터 product.quantity 의 값을 바꾸게 되면 초기 값이 바껴서 중복 계산하게 될 가능성이 있음 
+    setSelectedProduct(state, productId){
+      state.selectedProduct = state.products.find(product => product.id.toString() === productId);
+
+    }, 
     ADD_TO_CART(state, productForCart){
 
       /* 방법1. console.log("ADD_TO_CART ======> ", prodInCart)      */   
@@ -37,22 +41,8 @@ export default new Vuex.Store({
             }
           })
         })
-        console.log("cart에 있는 product ====>", state.cart);
+
         
-      /*  
-      if(!itemInCart){
-        product.quantity += parseInt(temp_qnt, 10); // 초기 값 + 수량이 더해지는 거거던 
-        product.total = parseInt(temp_qnt, 10) * product.price; //8.20 
-        product.options = selectedOps;
-        //### 8.21 여기에서 해당 프로덕트의 options 속성에 기본 값에 추가해준다. ###
-        state.cart.push(product);
-        console.log("첫 카트에 넣고 난 후 ========>", state.cart);
-      } else {
-        //product.quantity = product_qnt;
-        itemInCart.quantity += parseInt(temp_qnt, 10); //여기는 정상 계산ss
-        itemInCart.total = itemInCart.quantity * parseInt(itemInCart.price, 10);
-        console.log("아이템이 존재하는 경우 개수를 넣은 후 결과 =====>", state.cart);
-      }*/
     },
     SUBMIT_ORDER(state) {
       state.cart = [];
@@ -75,6 +65,9 @@ export default new Vuex.Store({
       } catch(e){
         console.error('Error fetching products:', error);
       }
+    },
+    setSelectedProduct({commit}, productId){
+      commit('setSelectedProduct', productId)
     },
     addToCart({ commit }, product) {
       commit('ADD_TO_CART', product);
