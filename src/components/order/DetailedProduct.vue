@@ -15,7 +15,7 @@
       v-model="p_quantities"
       @change="updatePQnt($event)"
     ></v-text-field>  
-    <v-btn color="primary" @click="addToCart(product)">Add to Cart</v-btn>
+    <v-btn color="primary" @click="putGoodInACart()">Add to Cart</v-btn>
   </v-card-actions>
   <v-row
     v-for="(op, index) in productsBeingSelected.options"
@@ -78,7 +78,7 @@ export default {
   data(){
     return{ 
       selectedOption: '', // 각 제품의 선택된 옵션을 저장하는 객체 selectedOption: {},
-      productsBeingSelected:{ id: 0, options: [] },
+      productsBeingSelected:{ id: 1000, options: [] },
       temp_quantity : 0,
       newSelectedProduct: {},
       newSelectedOp:{},
@@ -88,20 +88,19 @@ export default {
   },
   computed: {
     ...mapState(['products']),
-    ...mapState(['selectedProduct']),
+    ...mapState(['selectedProduct']), // *productlist 에서 물고 들어옴
+    ...mapState(['cart'])
     
   },
   methods: {
-     test(){
-      console.log("changed!!!")
-     }, 
-     delOp(op){
-      if (Array.isArray(this.productsBeingSelected.options)) {
-        this.productsBeingSelected.options = this.productsBeingSelected.options.filter(opt => opt.value !== op.value);
-      } else {
-        console.log("productsBeingSelected.options가 정의되지 않았습니다.");
-  }
-     },
+     updatePQnt(event, productId) {
+      console.log("updatePQnt 변경되고 있는 값 ========> ", event.target.value);
+      this.p_quantities = parseInt(event.target.value);
+      this.productsBeingSelected.quantity = this.p_quantities;
+      this.productsBeingSelected.total += (this.productsBeingSelected.price * 1);
+      console.log("this.productsBeingSelected =======>", this.productsBeingSelected)
+
+    },
     increaseOpNum(op){
       //바로 this.count 값을 올리고 그 갑을 optiton을 찾아서 -> 일시적 전체 옵션에 더해주는 로직 
       if(!op.quantity){
@@ -119,25 +118,25 @@ export default {
         return;
       } else {
         op.quantity -= 1;
+        this.productsBeingSelected.total -= op.price * 1;
       }
       console.log("this.productsBeingSelected ===============>", this.productsBeingSelected);
     },
-    
-    addToCart(product, index){
-
-
-    },
-    updatePQnt(event, productId) {
-
-      console.log("updatePQnt 변경되고 있는 값 ========> ", event.target.value);
-      this.p_quantities = parseInt(event.target.value);
-      this.productsBeingSelected.quantity = this.p_quantities;
-      this.productsBeingSelected.total += (this.productsBeingSelected.price * 1);
-      console.log("this.productsBeingSelected =======>", this.productsBeingSelected)
+    delOp(op){
+      if (Array.isArray(this.productsBeingSelected.options)) {
+        this.productsBeingSelected.options = this.productsBeingSelected.options.filter(opt => opt.value !== op.value);
+      } else {
+        console.log("productsBeingSelected.options가 정의되지 않았습니다.");
+      }
+     },
+    ...mapActions(['putGoodsInCart']), 
+    putGoodInACart(){
+      //1회(최초 담기) : this.productsBeingSelected -> cart (store.js) -> 백엔드에 저장 
+       this.putGoodsInCart(this.productsBeingSelected);
+       console.log("this.productsBeingSelected ===========> ", this.productsBeingSelected);
+       console.log("this.$store.state.cart ==========> ",  this.$store.state.cart);
       
-    },
-
-
+    }
   },
   watch: {
   selectedOption:{
