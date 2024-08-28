@@ -1,7 +1,7 @@
 <template>
   
   <v-container>
-    <v-col>
+    <v-col style="">
       <ProductList
         v-for="(product, index) in this.products"
         :key="index" 

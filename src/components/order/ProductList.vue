@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card :style="{ marginTop : '20px'}">
     <v-list>
       <v-card-title >제품 이름 : {{ title }} </v-card-title>
       <v-card-text> 제품 no.{{ id }} </v-card-text>
@@ -7,7 +7,7 @@
         <v-list-item
           @click="viewProductDetails(id)"
         >
-            <v-list-item-title>제품 상세</v-list-item-title>
+            <v-list-item-title :style="{ backgroundColor : '#39FF14', borderRadius: '10px'}">제품 상세</v-list-item-title>
         </v-list-item>
     </v-list>
   </v-card>
