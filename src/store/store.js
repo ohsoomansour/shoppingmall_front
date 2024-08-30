@@ -70,8 +70,8 @@ export default new Vuex.Store({
       commit('setSelectedProduct', productId)
     },
     putGoodsInCart({ dispatch, commit }, product) {
+      //1.현재 카트에 담겨져있는 아이템들을 필터 
       commit('PUT_GOODS_InCART', product);
-      // REST api 호출 
       dispatch('storeItemsIncart'); 
       //이렇게 하면 state.cart값에는 정상적으로 채워지지만 서버 입장, 1개 -> 1개+1개 -> 1개(수정)+1개
     },
