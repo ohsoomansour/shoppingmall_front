@@ -108,7 +108,7 @@ if(loginMenu) {
   }
 
 const filterFn = function (value, search, item) {
-    return caseSensitive.value ? value.indexOf(search) > -1 : value.toLowerCase().indexOf(search.toLowerCase()) > -1
-  }
+  return caseSensitive.value ? value.indexOf(search) > -1 : value.toLowerCase().indexOf(search.toLowerCase()) > -1
+}
 
 </script>

@@ -4,7 +4,12 @@ import App from "@/App.vue";
 
 
 const routes = [
+    {
+        path: "/products/my_items",
+        name: "myitems",
+        component : () => import("@/components/mypage/MyShoppingItems.vue")
 
+    },
     {
         path:"/detailedprod/:id",
         name: "detailedprod",

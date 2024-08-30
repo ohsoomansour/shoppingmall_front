@@ -20,7 +20,6 @@ export default new Vuex.Store({
     
   },
   mutations: {
-     
     setSelectedProduct(state, productId){
       state.selectedProduct = state.products.find(product => product.id.toString() === productId);
     }, 
@@ -42,7 +41,7 @@ export default new Vuex.Store({
       }
     },
     GET_ITEMS_FROM_CART(state, myItemsInCart){
-      //state.cart = myItemsInCart.
+      state.cart = myItemsInCart;
       
     }, 
     SUBMIT_ORDER(state) {
@@ -92,34 +91,23 @@ export default new Vuex.Store({
         }).then(res => console.log("카트 저장 성공!!" + res))
         .catch(e => console.error(e));
 
-
-        /*
-        const result = await(
-          await fetch('/api/store_ItemsInCart.do', {
-            method : 'POST',
-            headers : {
-              'Content-Type' : 'application/json',
-            },
-            body: JSON.stringify(data)
-
-          })
-        ).json();
-        console.log("storeItemsIncart'result ==========> ", result)*/
       } catch (e) {
         console.error('Error storing items in cart:', e);
       }
     },
-    async getItemsFromCart(){
+    async getItemsFromCart({ commit }){
       //### 나의 카트 화면의 비즈니스 로직 ### 
       // REST API -> 경로  /get_storedProducts
       const u_email = sessionStorage.getItem('u_email'); 
+      console.log("myItems's u_email =======>", u_email);
       const myItemsInCart =  await(
-        await fetch(`/api/products/get_storedMyItems?u_email=${encodeURIComponent(u_email)}`, {
+        await fetch(`/api/products/get_storedMyItems?u_email=${u_email}`, {
           method : 'GET'
         })
       ).json();
-      console.log("getItemsFromCart============>", myItemsInCart);
-      commit('GET_ITEMS_FROM_CART', myItemsInCart);
+      console.log("getItemsFromCart============>", myItemsInCart );+
+      commit('GET_ITEMS_FROM_CART', JSON.parse(myItemsInCart.items_cart));
+      console.log(this.state.cart)
     }
 
   }  
