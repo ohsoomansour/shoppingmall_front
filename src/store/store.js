@@ -88,7 +88,7 @@ export default new Vuex.Store({
           headers:{
             'Content-Type': 'application/json',
         },
-        }).then(res => console.log("카트 저장 성공!!" + res))
+        }).then(res => console.log("카트 저장 성공!!" + JSON.stringify(res)))
         .catch(e => console.error(e));
 
       } catch (e) {
