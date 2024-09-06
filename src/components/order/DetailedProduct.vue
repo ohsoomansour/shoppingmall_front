@@ -97,22 +97,27 @@ export default {
       console.log("updatePQnt 변경되고 있는 값 ========> ", event.target.value);
       this.p_quantities = parseInt(event.target.value);
       this.productsBeingSelected.quantity = this.p_quantities;
+      if(!this.productsBeingSelected.total){
+        this.productsBeingSelected.total = 0;
+      }
       this.productsBeingSelected.total += (this.productsBeingSelected.price * 1);
-      console.log("this.productsBeingSelected =======>", this.productsBeingSelected)
-
+      console.log("this.productsBeingSelected =======>", this.productsBeingSelected);
     },
     increaseOpNum(op){
       //바로 this.count 값을 올리고 그 갑을 optiton을 찾아서 -> 일시적 전체 옵션에 더해주는 로직 
       if(!op.quantity){
         op.quantity = 1;
-        this.productsBeingSelected.total += op.price * 1
+        if(!this.productsBeingSelected.total){
+          this.productsBeingSelected.total = 0;
+        }
+        this.productsBeingSelected.total += op.price * 1;
       } else {
         op.quantity += 1;
         this.productsBeingSelected.total += op.price * 1;
       }
       console.log("this.productsBeingSelected ===============>", this.productsBeingSelected);
     },
-    decreaseOpNum(op){
+    decreaseOpNum(op){3
       if(op.quantity < 1){
         alert('선택 옵션의 개수가 0개 입니다!');
         return;
@@ -135,7 +140,6 @@ export default {
        this.putGoodsInCart(this.productsBeingSelected);
        console.log("this.productsBeingSelected ===========> ", this.productsBeingSelected);
        console.log("this.$store.state.cart ==========> ",  this.$store.state.cart);
-      
     }
   },
   watch: {
@@ -155,22 +159,22 @@ export default {
           this.newSelectedProduct.id = selectedIntProdId;
           this.newSelectedProduct.title = selectedProduct.title;
           this.newSelectedProduct.price = selectedProduct.price;
+          //9.2 문제원인default quantity는 없음,
+          this.newSelectedProduct.quantity = 0;
           this.newSelectedProduct.quantity += this.p_quantities;
-          //{ id: 0, title: 'sm cosmetic', price: 11000, quantity: 0,  } // options: [ {id: 0 + "_0", title: '+50ml', value: 3000
           this.productsBeingSelected = this.newSelectedProduct; 
+          console.log("!isExistPId의 this.productsBeingSelected =============> ", this.productsBeingSelected);
           this.newSelectedProduct = {};
         }
         const selectedOpId =  this.selectedOption; 
         const prodBeingSelected = this.productsBeingSelected;
-
           //변동 감지 제품의 아이디 0, 1 === 선택되어있는 제품들 0, 1 -> 0 두 번! 
           if(prodBeingSelected.id === selectedIntProdId){
             console.log("옵션 만들어주는 곳 여기 들어와 ???? ")
             if(!Array.isArray(prodBeingSelected.options)){
               prodBeingSelected.options = [];
               const prodInList = this.products.find(prodInlist => prodInlist.id === selectedIntProdId);
-              const opInList = prodInList.options.find(opInList => opInList.value === selectedOpId);          
-
+              const opInList = prodInList.options.find(opInList => opInList.value === selectedOpId);
               this.newSelectedOp.text = opInList.text;
               this.newSelectedOp.value = opInList.value;
               this.newSelectedOp.price = opInList.price;
@@ -182,8 +186,6 @@ export default {
               // 해결: prod.options에 제품 1이 있어 ? 그러면 return;
               const prodInList = this.products.find(prodInlist => prodInlist.id === selectedIntProdId);
               const opInList = prodInList.options.find(opInList => opInList.value === selectedOpId);          
-              
-              
               //const isExistProd = prod.id ===  prodInList.id && prod.title === prodInList.title  
               const isExistOp = prodBeingSelected.options.some(opSelected => {
                 return opSelected.text === opInList.text && opSelected.value === opInList.value 
@@ -199,9 +201,6 @@ export default {
             }
           }
           //포맷을 만들어주기 위한 리스트에서 옵션을 가져옴  
-
-
- 
       } else {
         console.log("newValue가 undefined거나 null입니다.");
       } 
@@ -210,9 +209,6 @@ export default {
       deep: true, // 객체 내부의 변화를 감지하기 위해서 deep 옵션을 사용
   }
 },  
-
-
-
   mounted() {
     console.log("디테일 프로덕트 props's options =====>", this.options)
   }

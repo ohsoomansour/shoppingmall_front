@@ -4,6 +4,12 @@ import App from "@/App.vue";
 
 
 const routes = [
+
+    {
+        path: "/payment",
+        name: "kakaopay",
+        component : () => import("@/components/payments/KakaoPay.vue")
+    },
     {
         path: "/products/my_items",
         name: "myitems",

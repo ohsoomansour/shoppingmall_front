@@ -7,26 +7,52 @@ import axios from 'axios'; // axios import
  * @Function : Vuex
  * @Explain : dispatch가 action을 호출 -> action내, mutation을 커밋(commit)하여 상태를 변경            
  */
+
+// #플러그인 함수 :  mutation의 어떤 type이 발생한 후 store에 대한 참조를 받음, Store가 생성될 때 실행
+function putGoodsInCartPlugins(store){
+  store.subscribe((mutation, state) => {
+    // state의 cart값이 변경했을 때, 값이 있었다가 -> 리프레쉬 
+    //PUT_GOODS_InCART 호출, 최신 state의 cart 값 + 서버에 저장-> (플러그인을 통해서 작업)localStorage에 저장
+    //(리프레쉬 또는 로그 아웃) 최신 state.cart값 localStorage에서 가져오고 
+    if(mutation.type === 'PUT_GOODS_InCART'){
+      console.log("========= putGoodsInCartPlugins 동작중 =========")
+      console.log("putGoodsInCartPlugins내 state.cart ============>", state.cart);
+      localStorage.setItem('itemsInCart', JSON.stringify(state.cart));
+      // 로컬 스토리지에 가져오는 경우, 로그 아웃 상태 인지 또는 cart의 값이 []이다. -> localStorage.getItem('itemsInCart');
+    }
+  })
+}
+
 export default new Vuex.Store({
+  //Store가 생성될 때 실행
+  plugins:[putGoodsInCartPlugins],
   state:{
     products:[
-
       { id: 0, title: 'sm cosmetic', price: 11000, quantity: 0, options: [ { text : '+50ml', value : 0 + "_0", price : 3000, quantity:0 }, {text: '+70ml', value : 0 + "_1",  price: 5000, quantity:0 }]},
       { id: 1, title: '쌔럼', price : 13000, quantity: 0, options: [ {text : '+40ml', value : 1 + "_0", price : 2000, quantity:0 }, {text : '+80ml', value : 1 + "_1",  price : 7000, quantity:0 }]},
       { id: 2, title: '썬크림', price : 12000, quantity: 0, options: [ {text : '+10ml', value : 2 + "_0", price : 2000, quantity:0 }, {text : '+20ml', value : 2 + "_1", price : 7000, quantity:0 }]}
     ],
     selectedProduct: {},
     cart:[]
-    
   },
   mutations: {
     setSelectedProduct(state, productId){
       state.selectedProduct = state.products.find(product => product.id.toString() === productId);
     }, 
     PUT_GOODS_InCART(state, prodToBeIncludedInCart){
+       // 로컬 스토리지에 가져오는 경우, 로그 아웃 상태 인지 또는 cart의 값이 []이다. -> localStorage.getItem('itemsInCart');
+       //string값 반환 
+       let ls_itemsInCart = 
+       localStorage.getItem('itemsInCart')
+        ? JSON.parse(localStorage.getItem('itemsInCart'))
+        : [];
+       if(ls_itemsInCart.length > 0){
+         state.cart = ls_itemsInCart;
+       } 
       const prodExistInCart = state.cart.find(prodInCart => prodInCart.id === prodToBeIncludedInCart.id);
       if(!prodExistInCart){
         state.cart.push({...prodToBeIncludedInCart})
+
       } else {
         prodToBeIncludedInCart.options.forEach(opToBeIncludedInCart => {
           const opExistInCart = prodExistInCart.options.find(op => op.value === opToBeIncludedInCart.value);
@@ -36,13 +62,11 @@ export default new Vuex.Store({
           } else {
             prodExistInCart.options.push({...opToBeIncludedInCart});
           }
-
         })
       }
     },
     GET_ITEMS_FROM_CART(state, myItemsInCart){
       state.cart = myItemsInCart;
-      
     }, 
     SUBMIT_ORDER(state) {
       state.cart = [];
@@ -67,7 +91,7 @@ export default new Vuex.Store({
       }
     },
     setSelectedProduct({commit}, productId){
-      commit('setSelectedProduct', productId)
+      commit('setSelectedProduct', productId);
     },
     putGoodsInCart({ dispatch, commit }, product) {
       //1.현재 카트에 담겨져있는 아이템들을 필터 
@@ -78,9 +102,7 @@ export default new Vuex.Store({
     async storeItemsIncart({ commit, state }){
       //{ commit, state }는 context의 구조 분해 할당 
       //state.cart 값 -> /store_ItemsInCart 경로 서버로 보내고(저장한 아이디 & 카트 목록) -> cart 
-      
       try {
-
         const data = {
           items_cart: state.cart,
         };
@@ -105,10 +127,9 @@ export default new Vuex.Store({
           method : 'GET'
         })
       ).json();
-      console.log("getItemsFromCart============>", myItemsInCart );+
       commit('GET_ITEMS_FROM_CART', JSON.parse(myItemsInCart.items_cart));
       console.log(this.state.cart)
     }
 
-  }  
+  }
 })
