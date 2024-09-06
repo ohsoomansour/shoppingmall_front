@@ -11,6 +11,21 @@ const routes = [
         component : () => import("@/components/payments/KakaoPay.vue")
     },
     {
+        path: "/payment/approval",
+        name : "kakaopay_success",
+        component : () => import("@/components/payments/KakaoPayAppoval.vue")
+    },
+    {
+        path: "/payment/fail",
+        name : "kakaopay_fail",
+        component : () => import("@/components/payments/KaokaoPayFail.vue")
+    },
+    {
+        path: "/payment/cancel",
+        name : "kakaopay_cancel",
+        component : () => import("@/components/payments/KakaoPayCancel.vue")
+    },
+    {
         path: "/products/my_items",
         name: "myitems",
         component : () => import("@/components/mypage/MyShoppingItems.vue")
@@ -46,11 +61,7 @@ const routes = [
         name: "posts",
         component: () => import("@/components/post/PostList.vue")
     },
-    
-    
-
 ]
-
 
 
 const router = createRouter({
