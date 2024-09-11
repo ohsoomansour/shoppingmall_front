@@ -29,7 +29,6 @@ const routes = [
         path: "/products/my_items",
         name: "myitems",
         component : () => import("@/components/mypage/MyShoppingItems.vue")
-
     },
     {
         path:"/detailedprod/:id",
@@ -50,6 +49,12 @@ const routes = [
        path : "/user/signup",
        name : "signup",
        component : () => import("@/components/member/SignUp.vue")
+    },
+    /* ######################## Spring Security ######################### */
+    {
+        path: "/sec_user/signup",
+        name: "sec_signup",
+        component: () => import("@/components/member_security/SignUp.vue")
     },
     {
         path : "/posts/writing",
