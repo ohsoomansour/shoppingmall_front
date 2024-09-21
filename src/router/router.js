@@ -46,7 +46,7 @@ const routes = [
         component : () => import("@/components/member/LogIn.vue") 
     },
     {
-       path : "/user/signup",
+       path : "/user/join",
        name : "signup",
        component : () => import("@/components/member/SignUp.vue")
     },
@@ -55,6 +55,11 @@ const routes = [
         path: "/sec_user/signup",
         name: "sec_signup",
         component: () => import("@/components/member_security/SignUp.vue")
+    },
+    {
+        path: "/sec_user/login",
+        name: "sec_loginPage",
+        component: () => import("@/components/member_security/LogIn.vue")
     },
     {
         path : "/posts/writing",

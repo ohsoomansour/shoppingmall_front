@@ -19,6 +19,7 @@
         <!-- 회원정보입력 -->
         <v-card>
           <v-card-title class="headline">회원정보입력</v-card-title>
+          <v-text-field style="display: none;" v-model="login_type">기본 0</v-text-field>
           <v-card-text>
             <!-- 회원유형 -->
             <v-radio-group v-model="authorities" row @change="authorChange">
@@ -172,6 +173,7 @@ export default {
       emailAuthResult : null,
       valid: false,
       authorities: [""],
+      login_type: 0,
       login_id: "",
       password: "",
       address: "",
@@ -270,14 +272,14 @@ export default {
         return;
       }
       this.axios
-        .get('/api/sec_user/userDuplicCheck.do', {
-          params:{
+        .post('/api/sec_user/userDuplicCheck.do', {
             gubun:"ID",
             login_id: this.login_id,
-          }
-        })
+          })
         .then(res => {
           let user_count = res.data;
+          console.log("================= 중복 아이디 확인 ==================== ", res );
+          
           if(user_count === 0){
             this.idCheckResult = { type:"success", message: "사용 가능한 아이디입니다." };
 
