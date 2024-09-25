@@ -49,7 +49,7 @@ module.exports = defineConfig({
     // Proxy 설정
     proxy: {
       // 경로가 "/api" 로 시작하는 요청을 대상으로 proxy 설정, target default 포트가 8080 ? 
-      '/api': {
+      '/': {
         target: 'http://localhost:8080',   //## 프록시가 요청을 전달할 백엔드 서버의 주소  
         changeOrigin: true,  //원래의 요청 출처(origin = localhost:3000)를 프록시 서버의 출처(localhost:8080)로 변결할지 여부 설정 
         // 요청 경로에서 '/api' 제거
