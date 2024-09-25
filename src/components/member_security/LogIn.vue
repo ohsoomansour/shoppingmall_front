@@ -127,7 +127,7 @@ export default {
       formData.append("email", this.emailToFindPw);
   
       this.axios
-      .post("/api//send-mail/password", formData, {
+      .post("/api/send-mail/password", formData, {
         headers:{
           'Content-Type' : 'application/json'
         }
@@ -150,26 +150,32 @@ export default {
         this.alertPopupFocus('비밀번호를 입력해 주세요.', 'u_pw');
         return false;
       }
+
       console.log("===========>" + this.u_email);
       console.log("================> " + this.u_pw);
-
+      /**/ 
       let formData = new FormData();
-      formData.append("u_email", this.u_email);
-      formData.append("u_pw", this.u_pw);
-      this.axios
-      .post('/api/login/Vueloginx.do', formData, {
-        headers : {
-          'Content-Type' : 'application/json', //'application/json'   //'multipart/form-data'
-        }})
+      formData.append("login_id", this.u_email);
+      formData.append("password", this.u_pw);
+
+      let data = {
+        login_id: this.u_email,
+        password: this.u_pw
+      };
+      
+      this.axios.post('/api/sec/login', data, {
+        headers: {
+          'Content-Type': 'application/json',      //'application/x-www-form-urlencoded', // 
+          'Authorization': `Bearer ${"tokenTest"}`
+        }
+      })
       .then(response => {
         console.log('===================== 로그인 성공 ===============');
         console.log(response.data);
         console.log(response)
         if(response.statusText === "OK"){
           // Save the result in session storage
-          sessionStorage.setItem('loginMenu', JSON.stringify(response.data.loginmenu));
-          sessionStorage.setItem('u_id', response.data.u_id);
-          sessionStorage.setItem('u_email', response.data.u_email);
+
           window.location.href="/#/posts"
         } else {
           alert("아이디 혹은 비밀번호가 잘못 되었습니다")

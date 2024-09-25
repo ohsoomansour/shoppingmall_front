@@ -1,6 +1,5 @@
-import {createWebHashHistory, createWebHistory, createRouter } from "vue-router";
-import PostList from "@/components/post/PostList.vue";
-import App from "@/App.vue";
+import {createWebHashHistory, createRouter } from "vue-router";
+
 
 
 const routes = [
@@ -52,7 +51,7 @@ const routes = [
     },
     /* ######################## Spring Security ######################### */
     {
-        path: "/sec_user/signup",
+        path: "/sec_user/join",
         name: "sec_signup",
         component: () => import("@/components/member_security/SignUp.vue")
     },

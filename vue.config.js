@@ -10,10 +10,20 @@
  * @client : { overlay :false }; "컴파일 오류나 린트 오류가 발생했을 때 브라우저 화면에 오버레이를 표시하지 않음 "
  * @proxy : 프록시 설정은 API 요청을  다른 서버로 프록시(중계)하는 데 사용, 이는 CORS 문제를 해결하거나 개발 중에 다른 서버의 API와 통실할 때 유용 
  *  ##모든 경로('/')로 시작하는 요청을 프록시합니다. 기본적으로 모든 요청을 프록시합니다.
- *  - target : 프록시 대상 서버를 http://localhost로 설정, 모든 프록시 요청은 로컬 호스트로 전달 
- *  - changeOrigin : 프록시 요청의 호스트 헤더를 대상 서버의 호스트로 변경
- *  - pathRewrite : 프록시 요청 경로에서 /api를 제거, 예를 들어 /api/users 요청은 /users로 전달 
+ *  @target : 프록시 대상 서버를 http://localhost로 설정, 모든 프록시 요청은 로컬 호스트로 전달 
+ *  @changeOrigin : true  + target은 'http://localhost:8080'
+ *    1)클라이언트 서버: localhost:3000/api/pay/ready -> 2) fetch("/api/pay/ready")로 요청 -> 내 개발서버, 요청  3)https://kapi.kakao.com/v1/payment/ready
+ *      - 해석: "요청이 localhost:3000가 아닌 localhost:8080요청이 온 것으로 보게 된다."
+ *              그리고 개발 서버 8080은 'proxy서버 역할' 
+ *      - Access-Control-Allow-Origin: "localhost:8080" 쌉 가능 
+ *     
+ *  @changeOrigin : false
+ *      1)클라이언트 서버: localhost:3000/api/pay/ready -> 2) fetch("/api/pay/ready")로 요청 -> 내 개발서버, 요청  3)https://kapi.kakao.com/v1/payment/ready
+ *      - 해석: 요청은 localhost:3000/ready 그대로 이렇게 되면 외부api(=카카오 페이)는 cors 정책에 따라 차단할 가능성이 생김 
+ *      -  Access-Control-Allow-Origin: "*"가 아닌 경우 막힘 
  * 
+ *  @pathRewrite : 프록시 요청 경로에서 /api를 제거, 예를 들어 /api/users 요청은 /users로 전달 
+ *      
  *  - ws : false 
  * @npm run serve : "실시간으로 컴파일하고 변경 사항을 감지하여 브라우저에 자동으로 반영"
  *  순서 : 변경 감지 -> .vue 파일, Javascript 모듈로 변환, CSS 파일 등이 Webpack과 관련 로더를 통해 처리
@@ -39,9 +49,9 @@ module.exports = defineConfig({
     // Proxy 설정
     proxy: {
       // 경로가 "/api" 로 시작하는 요청을 대상으로 proxy 설정, target default 포트가 8080 ? 
-      '/': {
-        target: 'http://localhost:8080',   //## 주의 사항:포트가 꼬여있을 수 있다. port kill이 되지 않을 경우 -> 컴퓨터 off -> cmd에서 netsta -a -o port확인 필요!  ## 
-        changeOrigin: true,
+      '/api': {
+        target: 'http://localhost:8080',   //## 프록시가 요청을 전달할 백엔드 서버의 주소  
+        changeOrigin: true,  //원래의 요청 출처(origin = localhost:3000)를 프록시 서버의 출처(localhost:8080)로 변결할지 여부 설정 
         // 요청 경로에서 '/api' 제거
         pathRewrite: { '^/api': '' },
         ws: false,

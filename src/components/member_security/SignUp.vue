@@ -19,13 +19,14 @@
         <!-- 회원정보입력 -->
         <v-card>
           <v-card-title class="headline">회원정보입력</v-card-title>
-          <v-text-field style="display: none;" v-model="login_type">기본 0</v-text-field>
+          <v-text-field style="display: none;" v-model="login_type">login_type 기본 0</v-text-field>
           <v-card-text>
             <!-- 회원유형 -->
             <v-radio-group v-model="authorities" row @change="authorChange">
               <v-radio label="관리자" value="ROLE_ADMIN"></v-radio>
               <v-radio label="기업 계정" value="ROLE_BIZ"></v-radio>
               <v-radio label="일반 고객" value="ROLE_CUSTOMER"></v-radio>
+
             </v-radio-group>
             
             <!-- 아이디 -->
@@ -61,7 +62,7 @@
             ></v-text-field>
             <!-- 이름 -->
             <v-text-field
-              v-model="u_name"
+              v-model="user_name"
               label="이름"
               required
               :rules="[v => !!v || '이름은 필수입니다.']"
@@ -172,7 +173,7 @@ export default {
       rec_authNum : "",
       emailAuthResult : null,
       valid: false,
-      authorities: [""],
+      authorities: "",
       login_type: 0,
       login_id: "",
       password: "",
@@ -195,7 +196,8 @@ export default {
   name : 'signup',
   methods:{
     authorChange(e){
-        this.authorities[0] = e.target.value;
+        this.authorities = e.target.value;
+        console.log("this.authorities=======> " + this.authorities);
     },
     onAuth(){
       console.log("authNum ===> " + this.authNum);
@@ -224,11 +226,12 @@ export default {
         domain = this.w_emailDomain;
       } 
       formData.append("email", this.biz_email1 + "@" + domain);
-      
+      this.email = this.biz_email1 + "@" + domain;
       this.axios
       .post("/api/send-mail/email", formData, {
         headers:{
-         'Content-Type' : 'application/json' //'application/json' //'multipart/form-data'
+         'Content-Type' : 'application/json', //'application/json' //'multipart/form-data'
+         'Authorization' : `Bearer ${"email_test"}`
         }
       }) //c
       .then(res => {
@@ -251,7 +254,7 @@ export default {
       return /^\d+$/.test(v) || "숫자만 입력 가능합니다.";
     },
     SelectDomain(e) {
-      console.log("event", e)
+      //console.log("event", e)
     },
     execDaumPostcode() {
       // Daum 주소 API 연동
@@ -275,7 +278,13 @@ export default {
         .post('/api/sec_user/userDuplicCheck.do', {
             gubun:"ID",
             login_id: this.login_id,
-          })
+          },
+          {
+            headers: {
+            'Authorization': `Bearer ${"test"}` // JWT 토큰을 여기에 포함
+          }
+          }
+        )
         .then(res => {
           let user_count = res.data;
           console.log("================= 중복 아이디 확인 ==================== ", res );
@@ -293,31 +302,38 @@ export default {
       if (!this.$refs.form.validate()) {
         return;
       }
-      console.log("form 데이터 확인 =========>" + this.u_type, this.u_email, this.u_pw, this.u_name, this.address, this.detailAddress, this.biz_email1, this.selectedDomain, this.w_emailDomain)
-      //이메일 
-      let biz_email2="";
-      if(this.selectedDomain === "직접 입력"){
-        biz_email2 = this.w_emailDomain;
-      } else {
-        biz_email2 = this.selectedDomain; 
-      }
+      /*
+         @ModelAttribute는 기본적으로 multipart/form-data나 application/x-www-form-urlencoded 방식으로 전달되는 값을 처리   
+         JSON.stringify()로 변환된 문자열은 '단순 텍스트'로 처리되기 때문에 제대로 매핑되지 않습니다.   
+      */
       let formData = new FormData();
-      formData.append("authorities", this.authorities);
-      formData.append("login_id", this.login_id);
+      console.log("login_id =====> " + this.login_id)
+      console.log("password ====> " + this.password);
+      console.log("email =====> " + this.email);
+      console.log("this.email_verified ====> " + this.email_verified);
+      console.log("JSON.stringify([this.authorities] ====>" + JSON.stringify([this.authorities]));
+      console.log("address======>" +  JSON.stringify(this.address));
+      console.log("user_name ======>" + JSON.stringify(this.user_name));
+      console.log("u_ph======>" + JSON.stringify(this.u_ph));
+      formData.append("login_id",  this.login_id);
+      formData.append("login_type", this.login_type);
+      formData.append("email", this.email);
       formData.append("password", this.password);
+      formData.append("email_verified", this.email_verified);  // false 나오는 상태 
+      formData.append("authorities", this.authorities) // **주의: 폼 데이터는 ["ROLE_ADMIN"] -> "ROLE_ADMIN" 이렇게 인식함 
+      formData.append("address", this.address);
       formData.append("user_name", this.user_name);
-      formData.append("address", this.address + (this.selectedDomain === '직접 입력' ? this.w_emailDomain : this.selectedDomain) );
-      formData.append("email", this.biz_email1+ "@" + biz_email2);
-      formData.append("email_verified", this.email_verified);
       formData.append("u_ph", this.u_ph);
       this.axios
-        .post("/api/member/signUp.do", formData, {
+        .post("/api/sec_user/join", formData
+        ,{
           headers:{
-            'Content-Type' : 'multipart/form-data',
+            'Content-Type' : 'multipart/form-data', //application/json
+            'Authorization' : `Bearer ${"join_test"}`
           }
         }).then(res => {
           if(res.data >= 1){
-            window.location.href = "login"
+            //window.location.href = "login"
           }
         });
            
