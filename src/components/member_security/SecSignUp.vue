@@ -22,10 +22,10 @@
           <v-text-field style="display: none;" v-model="login_type">login_type 기본 0</v-text-field>
           <v-card-text>
             <!-- 회원유형 -->
-            <v-radio-group v-model="authorities" row @change="authorChange">
-              <v-radio label="관리자" value="ROLE_ADMIN"></v-radio>
-              <v-radio label="기업 계정" value="ROLE_BIZ"></v-radio>
-              <v-radio label="일반 고객" value="ROLE_CUSTOMER"></v-radio>
+            <v-radio-group v-model="authority" row @change="authorChange">
+              <v-radio label="관리자" value="ADMIN"></v-radio>
+              <v-radio label="기업 계정" value="BIZ"></v-radio>
+              <v-radio label="일반 고객" value="CUSTOMER"></v-radio>
 
             </v-radio-group>
             
@@ -173,7 +173,7 @@ export default {
       rec_authNum : "",
       emailAuthResult : null,
       valid: false,
-      authorities: "",
+      authority: "",
       login_type: 0,
       login_id: "",
       password: "",
@@ -320,7 +320,7 @@ export default {
       formData.append("email", this.email);
       formData.append("password", this.password);
       formData.append("email_verified", this.email_verified);  // false 나오는 상태 
-      formData.append("authorities", this.authorities) // **주의: 폼 데이터는 ["ROLE_ADMIN"] -> "ROLE_ADMIN" 이렇게 인식함 
+      formData.append("authority", this.authority) // **주의: 폼 데이터는 ["ROLE_ADMIN"] -> "ROLE_ADMIN" 이렇게 인식함 
       formData.append("address", this.address);
       formData.append("user_name", this.user_name);
       formData.append("u_ph", this.u_ph);

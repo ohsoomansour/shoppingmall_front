@@ -114,6 +114,7 @@ export default {
       emailToFindPw:"",
       u_email: '',
       u_pw: '',
+      token: '',
       gourl: '/'
     };
   },
@@ -142,6 +143,30 @@ export default {
       //let ref = ref;
       this.$refs[ref].focus(); // #다른 방법: this.#refs.u_email.focus(); 
     },
+    setCooke: function(name, value, day){
+
+      let today = new Date();
+      today.setDate(today.getDate() + day); 
+      document.cookie = name + "=" + value + "; path/; expires=" + today.toUTCString() + ";"           
+      console.log("document.cookie:"  + document.cookie);
+      },
+      getCookie: function(name){
+      //쿠키에서 token 값을 가져옴 x-jwt 이런 식으로 
+      let cookie = document.cookie + ";"
+      console.log('cookie' + cookie);
+      let idx = cookie.indexOf(name, 0);
+      let val = "";
+      console.log('idx:: ' + idx);
+      if(idx > -1){
+        cookie = cookie.substring(idx, cookie.length);
+        let begin = cookie.indexOf("=", 0) + 1; //  eyJhbGciOiJIUzUx...;
+        let end = cookie.indexOf(";", begin);   //
+        val = cookie.substring(begin, end);
+        
+      }
+      console.log("val::" + val);
+      return val;
+    },
     doLogin() {
       if (this.u_email.trim() === '') {
         this.alertPopupFocus('아이디를 입력해 주세요.', 'u_email'); 
@@ -162,11 +187,17 @@ export default {
         login_id: this.u_email,
         password: this.u_pw
       };
-      
+      let jwt = this.getCookie("token");
+      console.log("jwt ====> " + this.getCookie("token"));
+      if(jwt.length > 0){
+        this.token = this.getCookie("token");
+      } else {
+        this.token = "TokenDoesNotExist";
+      }
       this.axios.post('/api/sec/login', data, {
         headers: {
           'Content-Type': 'application/json',      //'application/x-www-form-urlencoded', // 
-          'Authorization': `Bearer ${"tokenTest"}`
+          'Authorization': `Bearer ${this.token}`
         }
       })
       .then(response => {
@@ -174,9 +205,9 @@ export default {
         console.log(response.data);
         console.log(response)
         if(response.statusText === "OK"){
-          // Save the result in session storage
-
-          window.location.href="/#/posts"
+          // eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsmKTsiJjrp4wiLCJhd…H31DRNjXlnQ8nmZuvrhMoWCbqi4PcRxQIHbQfjxcgXZI9XERg
+          this.setCooke("token", response.data.token, 1);
+          window.location.href="/#/products"
         } else {
           alert("아이디 혹은 비밀번호가 잘못 되었습니다")
         }
@@ -185,13 +216,10 @@ export default {
         console.log(error);
       });
     },
-    forgotPassword() {
-      // Logic to handle password recovery
-    },
-    getHtmlContent() {
-      const htmlContent = this.$refs.content.innerHTML;
-      alert('HTML Content: ' + htmlContent);
-    }
-  }
+
+    
+
+  },
+
 };
 </script>
