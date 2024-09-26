@@ -68,39 +68,32 @@
               :rules="[v => !!v || '이름은 필수입니다.']"
             ></v-text-field>
             <!-- 이메일 -->
-            <v-row>
-              <v-col>
+            <v-row class="d-flex justify-center align-center" style="height: calc(100%);" >
+              <v-col >
                 <v-text-field
                   v-model="biz_email1"
                   label="이메일"
                   :rules="[v => !!v || '이메일은 필수입니다.']"
                 ></v-text-field>
               </v-col>
-              <v-col sm="2" >
-                <v-text-field 
-                  v-model="golbaeng"
-                  readonly  
-                  class="center-text"  
-                ></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field
-                  v-if="this.selectedDomain === '직접 입력'"
-                  v-model="w_emailDomain"
-                  label="도메인 직접입력"
-                  :rules="[v => !!v || '도메인은 필수입니다.']"
-                  
-                ></v-text-field>
-              </v-col>
-              <v-col>
+              <v-col sm="3" >
                 <v-select
                   label="도메인 선택"
                   v-model="selectedDomain"
                   :items="emailDomains"
                 ></v-select>
               </v-col>
-              <v-col>
-                {{ this.selectedDomain}}
+              <v-col  >
+                <v-text-field
+                  v-if="this.selectedDomain === '직접 입력'"
+                  v-model="w_emailDomain"
+                  label="직접입력"
+                  :rules="[v => !!v || '도메인은 필수입니다.']"
+                  
+                ></v-text-field>
+              </v-col>
+
+              <v-col  class="d-flex justify-center align-center mb-4">
                 <v-btn @click="getAuthNum" style="background-color: greenyellow; font-weight: bold">이메일 인증 </v-btn>
               </v-col>
               <v-col>
@@ -111,9 +104,6 @@
                 </v-text-field>
               </v-col>  
             </v-row>
-            <v-alert v-if="idCheckResult" :type="idCheckResult.type">
-              {{ idCheckResult.message }}
-            </v-alert>
             <v-alert v-if="emailAuthResult" :type="emailAuthResult.type">
                 {{ emailAuthResult.message }}
             </v-alert>
@@ -170,7 +160,7 @@ export default {
   data() {
     return {
       authNum: "",
-      rec_authNum : "",
+      rec_authNum : "rec_authNum_init",
       emailAuthResult : null,
       valid: false,
       authority: "",
@@ -189,7 +179,7 @@ export default {
       u_ph: "",
       w_emailDomain: "",
       selectedDomain: "선택 입력",
-      emailDomains: ["직접 입력", "naver.com", "gmail.com", "daum.net", "hanmail.net", "empas.com", "yahoo.com"],
+      emailDomains: ["직접 입력", "@naver.com", "@gmail.com", "@daum.net", "@hanmail.net", "@empas.com", "@yahoo.com"],
       idCheckResult: null,
     };
   },
@@ -225,15 +215,15 @@ export default {
       if (this.selectedDomain === "직접 입력"){
         domain = this.w_emailDomain;
       } 
-      formData.append("email", this.biz_email1 + "@" + domain);
-      this.email = this.biz_email1 + "@" + domain;
+      formData.append("email", this.biz_email1 + domain);
+      this.email = this.biz_email1 + domain;
       this.axios
       .post("/api/send-mail/email", formData, {
         headers:{
          'Content-Type' : 'application/json', //'application/json' //'multipart/form-data'
-         'Authorization' : `Bearer ${"email_test"}`
+         //'Authorization' : `Bearer ${"email_test"}`
         }
-      }) //c
+      }) 
       .then(res => {
         this.rec_authNum = res.data.authNum;
       })
@@ -315,6 +305,7 @@ export default {
       console.log("address======>" +  JSON.stringify(this.address));
       console.log("user_name ======>" + JSON.stringify(this.user_name));
       console.log("u_ph======>" + JSON.stringify(this.u_ph));
+      
       formData.append("login_id",  this.login_id);
       formData.append("login_type", this.login_type);
       formData.append("email", this.email);
@@ -354,5 +345,7 @@ export default {
 .center-text .v-input__control > input {
   text-align: center;
 }
+
+
 
 </style>
