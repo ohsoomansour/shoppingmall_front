@@ -297,15 +297,7 @@ export default {
          JSON.stringify()로 변환된 문자열은 '단순 텍스트'로 처리되기 때문에 제대로 매핑되지 않습니다.   
       */
       let formData = new FormData();
-      console.log("login_id =====> " + this.login_id)
-      console.log("password ====> " + this.password);
-      console.log("email =====> " + this.email);
-      console.log("this.email_verified ====> " + this.email_verified);
-      console.log("JSON.stringify([this.authorities] ====>" + JSON.stringify([this.authorities]));
-      console.log("address======>" +  JSON.stringify(this.address));
-      console.log("user_name ======>" + JSON.stringify(this.user_name));
-      console.log("u_ph======>" + JSON.stringify(this.u_ph));
-      
+
       formData.append("login_id",  this.login_id);
       formData.append("login_type", this.login_type);
       formData.append("email", this.email);
@@ -316,7 +308,7 @@ export default {
       formData.append("user_name", this.user_name);
       formData.append("u_ph", this.u_ph);
       this.axios
-        .post("/api/sec_user/join", formData
+        .post("/api/sec/join", formData
         ,{
           headers:{
             'Content-Type' : 'multipart/form-data', //application/json

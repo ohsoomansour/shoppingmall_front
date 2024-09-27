@@ -39,17 +39,13 @@ const routes = [
         name : "products",
         component : () => import("@/components/order/Products.vue")  
     },
-    {
-        path : "/user/login",
-        name : "login",
-        component : () => import("@/components/member/LogIn.vue") 
-    },
-    {
-       path : "/user/join",
-       name : "signup",
-       component : () => import("@/components/member/SignUp.vue")
-    },
+    
     /* ######################## Spring Security ######################### */
+    {
+        path: "/admin/user_management",
+        name: "suer_management",
+        component: () => import("@/components/admin/UserManagement.vue")
+    },
     {
         path: "/sec_user/join",
         name: "sec_signup",
