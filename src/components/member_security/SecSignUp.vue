@@ -164,7 +164,7 @@ export default {
       emailAuthResult : null,
       valid: false,
       authority: "",
-      login_type: 0,
+      login_type: 1,
       login_id: "",
       password: "",
       address: "",

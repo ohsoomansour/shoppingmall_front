@@ -3,8 +3,12 @@ import {createWebHashHistory, createRouter } from "vue-router";
 
 
 const routes = [
-
     {
+        path: "/auth/success",
+        name: "kakaopay",
+        component : () => import("@/components/member_security/OAauth2_AuthSuccess.vue")
+    }
+    ,{
         path: "/payment",
         name: "kakaopay",
         component : () => import("@/components/payments/KakaoPay.vue")

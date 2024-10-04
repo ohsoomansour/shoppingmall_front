@@ -14,6 +14,8 @@
     - 해석 : 화면의 sm 사이즈(=576픽셀에서 767픽셀 사이) 전은 12그리드 / sm 이상은 6grid 
     # <v-col sm="4" > 
     - 해석 : 화면의 sm 사이즈(=576픽셀에서 767픽셀 사이) 전은 12그리드 / sm 이상은 4grid 
+
+    redirect_uri=http://localhost:8088/#/oauth2/redirect
 -->
 <template>
 <v-app>
@@ -67,7 +69,19 @@
                       비밀번호 찾기
                     </v-btn>
                   </v-col>
-                  
+                  <v-col>
+                    <!-- http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:8088/#/oauth2/redirect 
+                     *리다이렉트 페이지: '사용자 인증까지 모든 걸 완료후 보내지는 페이지'
+                    -->
+                    <v-btn class="social-btn google-btn" block href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:8088/#/oauth2/redirect">
+                      <v-col class="text-left">
+                          <v-icon left class="social-icon">mdi-google</v-icon> 
+                      </v-col>
+                      <v-col class="ml-10">
+                          <span>구글 계정으로 로그인</span>
+                      </v-col>
+                  </v-btn>
+                  </v-col>
                 </v-row>
               </v-container>
             </v-form>
@@ -119,6 +133,11 @@ export default {
     };
   },
   methods: {
+
+
+
+
+
     popUpToFindPW(){
       
     },
