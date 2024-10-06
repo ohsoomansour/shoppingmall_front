@@ -72,8 +72,9 @@
                   <v-col>
                     <!-- http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:8088/#/oauth2/redirect 
                      *리다이렉트 페이지: '사용자 인증까지 모든 걸 완료후 보내지는 페이지'
+                     * v-if="" token이 존재하면 로그인 요청 -> jwt필터에 걸쳐서 -> 인증 
                     -->
-                    <v-btn class="social-btn google-btn" block href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:8088/#/oauth2/redirect">
+                    <v-btn @click="googleAuth" class="social-btn google-btn" block >
                       <v-col class="text-left">
                           <v-icon left class="social-icon">mdi-google</v-icon> 
                       </v-col>
@@ -81,6 +82,8 @@
                           <span>구글 계정으로 로그인</span>
                       </v-col>
                   </v-btn>
+
+   
                   </v-col>
                 </v-row>
               </v-container>
@@ -124,6 +127,7 @@
 export default {
   data() {
     return {
+      token: null,
       dialog: false, // 팝업창 열림 여부를 제어하는 데이터
       emailToFindPw:"",
       u_email: '',
@@ -133,11 +137,35 @@ export default {
     };
   },
   methods: {
-
-
-
-
-
+    async googleAuth(e){
+      
+      let accessToken = this.getCookie("accessToken");
+      console.log(accessToken);
+      if(accessToken.length > 0 ){
+        console.log("this.accessToken =====> ", accessToken);
+        //accesToken이 존재할 경우
+        const res = 
+        await(
+          await fetch("/api/sec/login",{
+          method: 'POST',
+          headers:{
+          'Content-Type' : 'application/json',
+          'Authorization' : `Bearer ${accessToken}`,
+          body: JSON.stringify({
+            login_id: "",
+            password: "",
+            login_type:2
+          })
+        }})
+        ).json()
+        if(res.message === "Authentication successful"){
+          window.location.href = "/#/products"
+        }
+        console.log("result ===> ", res);
+      } else { 
+        window.location.href="http://localhost:8080/oauth2/authorize/google";
+      }
+    },
     popUpToFindPW(){
       
     },
@@ -153,8 +181,6 @@ export default {
         }
       })
       .then(res => alert(JSON.stringify(res.data)))
-      
-
     },
     alertPopupFocus(message, ref) {
       console.log("===========>" + ref); //u_email , u_pw
@@ -163,28 +189,26 @@ export default {
       this.$refs[ref].focus(); // #다른 방법: this.#refs.u_email.focus(); 
     },
     setCooke: function(name, value, day){
-
       let today = new Date();
       today.setDate(today.getDate() + day); 
-      document.cookie = name + "=" + value + "; path/; expires=" + today.toUTCString() + ";"           
+      document.cookie = name + "=" + value + "; path=/; expires=" + today.toUTCString() + ";"           
       console.log("document.cookie:"  + document.cookie);
       },
-      getCookie: function(name){
+    getCookie: function(name){
       //쿠키에서 token 값을 가져옴 x-jwt 이런 식으로 
       let cookie = document.cookie + ";"
-      console.log('cookie' + cookie);
-      let idx = cookie.indexOf(name, 0);
+      console.log('cookie :' + cookie);
+      let idx = cookie.indexOf(name, 0);  // name이 처음 등장하는 위치 
       let val = "";
       console.log('idx:: ' + idx);
       if(idx > -1){
-        cookie = cookie.substring(idx, cookie.length);
-        let begin = cookie.indexOf("=", 0) + 1; //  eyJhbGciOiJIUzUx...;
+        cookie = cookie.substring(idx, cookie.length);   
+        let begin = cookie.indexOf("=", 0) + 1; // accessToken=eyJhbGciOiJIUzUx...;
         let end = cookie.indexOf(";", begin);   //
-        val = cookie.substring(begin, end);
-        
+        val = cookie.substring(begin, end).trim();
       }
-      console.log("val::" + val);
-      return val;
+        console.log("val::" + val);
+        return val;
     },
     doLogin() {
       if (this.u_email.trim() === '') {
@@ -224,7 +248,6 @@ export default {
         console.log(response.data);
         console.log(response)
         if(response.statusText === "OK"){
-          // eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsmKTsiJjrp4wiLCJhd…H31DRNjXlnQ8nmZuvrhMoWCbqi4PcRxQIHbQfjxcgXZI9XERg
           this.setCooke("token", response.data.token, 1);
           window.location.href="/#/products"
         } else {
@@ -235,10 +258,15 @@ export default {
         console.log(error);
       });
     },
-
-    
-
   },
+  mounted(){
+    console.log(this.getCookie("accessToken"));
+    /*
+    let token = this.getCookie("accesToken");
+    if(typeof token === "string"){
+      console.log("accessToken is string ");
+    } */
+  }
 
 };
 </script>
