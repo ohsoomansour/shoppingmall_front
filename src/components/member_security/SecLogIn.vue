@@ -173,7 +173,6 @@ export default {
       //popup 창 -> user의 u-email -> pw찾기 api 
       let formData =  new FormData();
       formData.append("email", this.emailToFindPw);
-  
       this.axios
       .post("/api/send-mail/password", formData, {
         headers:{
