@@ -5,7 +5,7 @@ import {createWebHashHistory, createRouter } from "vue-router";
 const routes = [
     {
         path: "/auth/success",
-        name: "kakaopay",
+        name: "oauth2_success",
         component : () => import("@/components/member_security/OAauth2_AuthSuccess.vue")
     }
     ,{
