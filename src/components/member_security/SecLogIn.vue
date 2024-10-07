@@ -78,7 +78,7 @@
                           <v-icon left class="social-icon">mdi-google</v-icon> 
                       </v-col>
                       <v-col class="ml-10">
-                          <span>구글 계정으로 로그인</span>
+                          <span>구글 계정</span>
                       </v-col>
                   </v-btn>
                   </v-col>
