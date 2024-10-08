@@ -5,7 +5,7 @@ import axios from 'axios'; // axios import
 
 /** 
  * @Function : Vuex
- * @Explain : dispatch가 action을 호출 -> action내, mutation을 커밋(commit)하여 상태를 변경            
+ * @Explain : dispatch가 action을 호출 -> mutation을 커밋(commit)하여   state값을 변경            
  */
 
 // #플러그인 함수 :  mutation의 어떤 type이 발생한 후 store에 대한 참조를 받음, Store가 생성될 때 실행
@@ -33,7 +33,8 @@ export default new Vuex.Store({
       { id: 2, title: '썬크림', price : 12000, quantity: 0, options: [ {text : '+10ml', value : 2 + "_0", price : 2000, quantity:0 }, {text : '+20ml', value : 2 + "_1", price : 7000, quantity:0 }]}
     ],
     selectedProduct: {},
-    cart:[]
+    cart:[],
+    menuList:[]
   },
   mutations: {
     setSelectedProduct(state, productId){
@@ -71,6 +72,9 @@ export default new Vuex.Store({
     SUBMIT_ORDER(state) {
       state.cart = [];
 
+    },
+    STORE_MENU_LIST(state, menuToBeStoredInMenuList){
+      state.menuList = menuToBeStoredInMenuList;
     }
   },
   actions:{
@@ -129,6 +133,16 @@ export default new Vuex.Store({
       ).json();
       commit('GET_ITEMS_FROM_CART', JSON.parse(myItemsInCart.items_cart));
       console.log(this.state.cart)
+    },
+    async getMenuList({ commit }){
+      //## 소셜 로그인 인증 후 메뉴 리스트 가져오기 쿼리
+      const menuList = await(
+        await fetch('/api/auth/success', {
+          method: 'GET'
+        })
+      ).json();
+      console.log("store에서 =============>", menuList);
+      commit('STORE_MENU_LIST', JSON.parse(menuList))
     }
 
   }

@@ -15,7 +15,7 @@
     # <v-col sm="4" > 
     - 해석 : 화면의 sm 사이즈(=576픽셀에서 767픽셀 사이) 전은 12그리드 / sm 이상은 4grid 
 
-    redirect_uri=http://localhost:8088/#/oauth2/redirect
+    10.7 git desktopTest!!!!!
 -->
 <template>
 <v-app>
@@ -69,23 +69,20 @@
                       비밀번호 찾기
                     </v-btn>
                   </v-col>
+  
+                </v-row>
+                <v-row>  
                   <v-col>
-                    <!-- http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:8088/#/oauth2/redirect 
-                     *리다이렉트 페이지: '사용자 인증까지 모든 걸 완료후 보내지는 페이지'
-                     * v-if="" token이 존재하면 로그인 요청 -> jwt필터에 걸쳐서 -> 인증 
-                    -->
-                    <v-btn @click="googleAuth" class="social-btn google-btn" block >
+                  <v-btn @click="googleAuth" class="social-btn google-btn" block >
                       <v-col class="text-left">
                           <v-icon left class="social-icon">mdi-google</v-icon> 
                       </v-col>
                       <v-col class="ml-10">
-                          <span>구글 계정</span>
+                          <span class=" font-weight-bold">구글 계정</span>
                       </v-col>
-                  </v-btn>
-
-   
+                    </v-btn>
                   </v-col>
-                </v-row>
+                </v-row>  
               </v-container>
             </v-form>
           </v-card>
@@ -97,10 +94,8 @@
           <v-card-title class="headline">
             비밀번호 발급을 위해 이메일 계정을 입력하세요.
           </v-card-title>
-
           <v-card-text>
            <v-text-field v-model="emailToFindPw">
-
            </v-text-field>
            <v-btn
             style="background-color: greenyellow; font-weight: bold"
@@ -108,7 +103,6 @@
            > 비밀번호 발급 
            </v-btn>
           </v-card-text>
-
           <v-card-actions>
             <!-- 팝업 닫기 버튼 -->
             <v-spacer></v-spacer>
@@ -158,6 +152,7 @@ export default {
           })
         }})
         ).json()
+        console.log("google 로그인 ==========================>", res);
         if(res.message === "Authentication successful"){
           window.location.href = "/#/products"
         }
