@@ -1,18 +1,22 @@
 <template>
-  <p>Google 로그인 인증 완료! What's Up!</p>
+  <p>Google 로그인 인증 완료! What's Up!?</p>
+  <MenuList />
 
 </template>
 
 <script>
 import { useQuery } from '@tanstack/vue-query';
 import { mapState, useStore } from 'vuex';
-
+import MenuList from '../common/MenuList.vue';
  /**
   *@Date : 24.10.8
   *@setup : Vuex와 같은 외부 상태 접근 가능
    - setup() 내에서 Vuex 스토어, 라우터, 컴포넌트 간 'props' 등을 접근할 수 있습니다. 다음은 useStore()로 Vuex 스토어에 접근하고 있다.
   */
 export default {
+  components:{
+    MenuList
+  },
   data(){
 
   },

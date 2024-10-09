@@ -17,7 +17,6 @@
     <MenuList /> 
     <v-card class="mt-4">
       <v-card-title> 화장품 총판매 실시간 데이터 집계 API 및 배치 개발</v-card-title>
-      
       <v-card-text>
         <v-text-field
           v-model="search"
@@ -33,7 +32,6 @@
         :search="search"
         item-class="text-center"
       >
-
       </v-data-table>
       <v-btn href="/#/writing" target="_blank" style="background-color: greenyellow;">
         <v-icon left>mdi-open-in-new</v-icon>

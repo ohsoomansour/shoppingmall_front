@@ -132,7 +132,6 @@ export default {
   },
   methods: {
     async googleAuth(e){
-      
       let accessToken = this.getCookie("accessToken");
       console.log(accessToken);
       if(accessToken.length > 0 ){

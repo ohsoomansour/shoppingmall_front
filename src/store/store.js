@@ -74,6 +74,7 @@ export default new Vuex.Store({
 
     },
     STORE_MENU_LIST(state, menuToBeStoredInMenuList){
+      console.log("menuToBeStoredInMenuList ===>", menuToBeStoredInMenuList);
       state.menuList = menuToBeStoredInMenuList;
     }
   },
@@ -137,12 +138,12 @@ export default new Vuex.Store({
     async getMenuList({ commit }){
       //## 소셜 로그인 인증 후 메뉴 리스트 가져오기 쿼리
       const menuList = await(
-        await fetch('/api/auth/success', {
+        await fetch('/api/sec/gAuthSuccess', {
           method: 'GET'
         })
       ).json();
       console.log("store에서 =============>", menuList);
-      commit('STORE_MENU_LIST', JSON.parse(menuList))
+      commit('STORE_MENU_LIST', menuList)
     }
 
   }
