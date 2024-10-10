@@ -118,6 +118,9 @@
 </template>
 
 <script>
+//import { useStore } from 'vuex';
+import store from '@/store/store';
+
 export default {
   data() {
     return {
@@ -242,6 +245,10 @@ export default {
         console.log(response)
         if(response.statusText === "OK"){
           this.setCooke("token", response.data.token, 1);
+
+          store.state.authority = response.data.authorities;
+          console.log("store's authority", store.state.authority);
+          //this.setCooke("authorities", response.data.authorities, 1); // ["ROLE_ADMIN"] 또는 ["ROLE_CUSTOMER"] => 쿠키는 문자열만 저장 
           window.location.href="/#/products"
         } else {
           alert("아이디 혹은 비밀번호가 잘못 되었습니다")

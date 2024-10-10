@@ -1,54 +1,64 @@
 <template>
-  <h1>CartOrder</h1>
-  <v-select
-    :items="this.selectedProduct.options"
-    item-title="text"
-    item-value="value"
-    v-model="this.selectedOption"
-  >
-  </v-select>
-  <v-card-actions>
-    <v-text-field
-      label="Quantity"
-      type="number"
-      min="1"
-      v-model="p_quantities"
-      @change="updatePQnt($event)"
-    ></v-text-field>  
-    <v-btn color="primary" @click="putGoodInACart()">Add to Cart</v-btn>
-  </v-card-actions>
-  <v-row
-    v-for="(op, index) in productsBeingSelected.options"
-    :key="index"
-  > 
-    <v-col  class="d-flex flex-row align-center justify-center">
-      <v-card-text class="text-h6">{{ op.text }}</v-card-text>
-      <v-card-text class="text-h6">{{ op.quantity }}</v-card-text>
-      
-    </v-col>
-    <v-col  class="d-flex align-center justify-end mr-2"  >
-      <v-btn @click="decreaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">-</v-btn>
-      <v-btn @click="increaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">+</v-btn>
-      <v-btn @click="delOp(op)" style="background-color: #FF0003;">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="feather feather-x"
-      >
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-      </v-btn>
-    </v-col>
-  </v-row>
-
+  <v-container class="mx-auto">
+    <h1>CartOrder</h1>
+    <v-card  class="mx-auto">
+      <v-row class="mx-auto">
+        <!-- cols 12는 그 v-row(행)에서 12/12를 차지한다. sm은 10, md는 8, lg는 6-->
+        <v-col cols="12" sm="10" md="8" lg="6" class="mx-auto" >
+          <v-select
+            :items="this.selectedProduct.options"
+            item-title="text"
+            item-value="value"
+            v-model="this.selectedOption"
+          >
+          </v-select>
+          <v-card-actions>
+            <v-text-field
+              label="Quantity"
+              type="number"
+              min="1" 
+              v-model="p_quantities"
+              @change="updatePQnt($event)"
+            ></v-text-field>  
+            <v-btn color="primary" @click="putGoodInACart()">Add to Cart</v-btn>
+          </v-card-actions>
+        </v-col>
+      </v-row>
+      <v-row
+        v-for="(op, index) in productsBeingSelected.options"
+        :key="index"
+      > 
+          <v-col  
+            class="d-flex flex-row align-center justify-center"
+            cols="12" xs="6" sm="6" md="6" lg="6"
+          >
+            <v-card-text class="text-h6">{{ op.text }}</v-card-text>
+            <v-card-text class="text-h6">{{ op.quantity }}</v-card-text>
+          </v-col>
+          <v-col  class="d-flex align-center justify-center mr-2" cols="12" xs="6" sm="6" md="6" lg="6"   >
+            <v-btn @click="decreaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">-</v-btn>
+            <v-btn @click="increaseOpNum(op)" class="mr-2" style="background-color: greenyellow;">+</v-btn>
+            <v-btn @click="delOp(op)" style="background-color: #FF0003;">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-x"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            </v-btn>
+          </v-col>
+      </v-row>
+    </v-card>
+  </v-container>
 </template>
 
 

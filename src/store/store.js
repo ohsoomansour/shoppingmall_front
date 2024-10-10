@@ -1,11 +1,12 @@
-import Vue from 'vue';
 import Vuex from 'vuex'; 
 import axios from 'axios'; // axios import
 //Vue.use(Vuex); // Vue 프레임워크에 Vuex plugin 시스템에 등록하고 사용하도록 지시
 
 /** 
  * @Function : Vuex
- * @Explain : dispatch가 action을 호출 -> mutation을 커밋(commit)하여   state값을 변경            
+ * @Explain : dispatch가 action을 호출 -> mutation을 커밋(commit)하여   state값을 변경\
+ * @state : 중앙에 단순한 값을 저장하는 역할
+ * @getter : state 값을 기반으로 가공된 데이터를 반환 그리고 computed처럼 '캐싱 기능을 제공'             
  */
 
 // #플러그인 함수 :  mutation의 어떤 type이 발생한 후 store에 대한 참조를 받음, Store가 생성될 때 실행
@@ -34,7 +35,11 @@ export default new Vuex.Store({
     ],
     selectedProduct: {},
     cart:[],
-    menuList:[]
+    menuList:[],
+    authority: []
+  },
+  getters:{
+    authority: state => state.authority
   },
   mutations: {
     setSelectedProduct(state, productId){
@@ -145,6 +150,5 @@ export default new Vuex.Store({
       console.log("store에서 =============>", menuList);
       commit('STORE_MENU_LIST', menuList)
     }
-
   }
 })
